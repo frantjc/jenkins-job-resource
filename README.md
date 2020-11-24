@@ -1,1 +1,1 @@
-# jenkins-resource
+# jenkins-job-resource
