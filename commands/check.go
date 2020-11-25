@@ -53,18 +53,18 @@ func (c *Check) Execute() error {
 		return fmt.Errorf("unable to find job %s: %s", req.Source.Job, err)
 	}
 
-	info, err := job.GetInfo()
+	builds, err := job.GetBuilds()
 	if err != nil {
-		return fmt.Errorf("unable to get info for job %s: %s", req.Source.Job, err)
+		return fmt.Errorf("unable to get builds for job %s: %s", req.Source.Job, err)
 	}
 
 	var resp resource.CheckResponse
 
-	if hasBuilds := len(info.Builds) > 0; hasBuilds {
+	if len(builds) > 0 {
 		if req.Version != nil {
-			resp = append(resp, info.Builds[len(info.Builds) - 1])
+			resp = append(resp, builds[len(builds) - 1])
 		} else {
-			for _, build := range info.Builds {
+			for _, build := range builds {
 				if build.Number >= req.Version.Number {
 					resp = append(resp, build)
 				}
@@ -72,7 +72,7 @@ func (c *Check) Execute() error {
 		}
 
 		if foundResp := len(resp) > 0; !foundResp {
-			resp = append(resp, info.Builds[len(info.Builds) - 1])
+			resp = append(resp, builds[len(builds) - 1])
 		}
 	}
 

@@ -4,6 +4,11 @@ resource_types:
     source:
       repository: trivigy/discord-resource
 
+  - name: jenkins-job-resource
+    type: registry-image
+    source:
+      repository: logsquaredn/jenkins-job-resource
+
 
 
 resources:
@@ -29,10 +34,21 @@ resources:
     type: docker-image
     icon: docker
     check_every: 1h
-    source: 
+    source:
       username: ((docker.username))
       password: ((docker.password))
       repository: ((docker.username))/jenkins-job-resource
+
+  - name: jenkins-job-test
+    type: jenkins-job-resource
+    icon: test-tube
+    check_every: 1h
+    source:
+      url: ((jenkins.url))
+      job: ((jenkins.job.name))
+      username: ((jenkins.username))
+      password: ((jenkins.password))
+      token: ((jenkins.job.token))
 
   # - name: notify
   #   type: discord-resource
@@ -51,7 +67,15 @@ anchors:
     serial: true
 
 
-    
+
+groups:
+  - name: build
+    jobs: [update-pipeline, build-jenkins-job-resource-image-alpine, build-jenkins-job-resource-image-ubuntu]
+
+  - name: test
+    jobs: [test-job]
+
+
 jobs:
   - name: update-pipeline
     <<: *default_job_config
@@ -98,3 +122,11 @@ jobs:
           additional_tags: jenkins-job-resource/dockerfiles/ubuntu/tags
         get_params:
           skip_download: true
+
+
+  - name: test-job
+    <<: *default_job_config
+    plan:
+      - get: jenkins-job-test
+
+

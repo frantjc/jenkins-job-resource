@@ -27,7 +27,7 @@ func NewJenkins(i *JenkinsInput) (*Jenkins, error) {
 }
 
 func (j *Jenkins) getJobs() (*[]Job, error) {
-	req, err := http.NewRequest("GET", j.URL + "api/", nil)
+	req, err := http.NewRequest("GET", j.URL + "api/json/", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -166,8 +166,8 @@ func (j *Job) Build(token string, cause string, params *interface{}) error {
 	return nil
 }
 
-func (j *Job) GetInfo() (*JobResponse, error) {
-	req, err := http.NewRequest("GET", j.URL + "api/", nil)
+func (j *Job) GetBuilds() ([]Build, error) {
+	req, err := http.NewRequest("GET", j.URL + "api/json/", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -187,5 +187,5 @@ func (j *Job) GetInfo() (*JobResponse, error) {
 		return nil, err
 	}
 
-	return &jResp, nil
+	return jResp.Builds, nil
 }
