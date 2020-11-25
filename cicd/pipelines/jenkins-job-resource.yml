@@ -15,7 +15,17 @@ resources:
       uri: https://github.com/logsquaredn/jenkins-job-resource/
       branch: master
 
-  - name: jenkins-job-resource-image
+  - name: jenkins-job-resource-image-alpine
+    type: docker-image
+    icon: docker
+    check_every: 1h
+    source: 
+      username: ((docker.username))
+      password: ((docker.password))
+      repository: ((docker.username))/jenkins-job-resource
+      tag: alpine
+
+  - name: jenkins-job-resource-image-ubuntu
     type: docker-image
     icon: docker
     check_every: 1h
@@ -61,7 +71,7 @@ jobs:
         passed: [update-pipeline]
         trigger: true
 
-      - put: jenkins-job-resource-image
+      - put: jenkins-job-resource-image-alpine
         params:
           build: jenkins-job-resource/
           tag_as_latest: false
@@ -79,10 +89,10 @@ jobs:
         passed: [update-pipeline]
         trigger: true
 
-      - put: jenkins-job-resource-image
+      - put: jenkins-job-resource-image-ubuntu
         params:
           build: jenkins-job-resource/
-          tag_as_latest: false
+          tag_as_latest: true
           cache: true
           dockerfile: jenkins-job-resource/dockerfiles/ubuntu/Dockerfile
           additional_tags: jenkins-job-resource/dockerfiles/ubuntu/tags
