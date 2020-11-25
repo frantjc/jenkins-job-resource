@@ -7,12 +7,13 @@ COPY go.sum .
 RUN go mod download
 
 COPY . .
-# build to /assets/[check|in|out]
+RUN go build -o /assets/check ./cmd/check \
+    && go build -o /assets/in ./cmd/in \
+    && go build -o /assets/out ./cmd/out
 
 FROM alpine:edge AS resource
 
-ENV DEBAIN_FRONTEND=noninteractive
-RUN apt-get update
+RUN apk update
 COPY --from=builder assets/ opt/resource/
 RUN chmod +x /opt/resource/*
 
