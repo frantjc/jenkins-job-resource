@@ -63,10 +63,10 @@ jobs:
 
       - put: jenkins-job-resource-image
         params:
-          build: jenkins-job-resource
+          build: jenkins-job-resource/
           tag_as_latest: false
           cache: true
-          dockerfile: dockerfiles/alpine
+          dockerfile: jenkins-job-resource/dockerfiles/alpine/Dockerfile
           additional_tags: jenkins-job-resource/dockerfiles/alpine/tags
         get_params:
           skip_download: true
@@ -81,10 +81,10 @@ jobs:
 
       - put: jenkins-job-resource-image
         params:
-          build: jenkins-job-resource
+          build: jenkins-job-resource/
           tag_as_latest: false
           cache: true
-          dockerfile: dockerfiles/ubuntu
+          dockerfile: jenkins-job-resource/dockerfiles/ubuntu/Dockerfile
           additional_tags: jenkins-job-resource/dockerfiles/ubuntu/tags
         get_params:
           skip_download: true
