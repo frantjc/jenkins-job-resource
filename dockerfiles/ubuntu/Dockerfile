@@ -1,4 +1,4 @@
-FROM golang:ubuntu AS builder
+FROM golang:latest AS builder
 
 WORKDIR /src
 
