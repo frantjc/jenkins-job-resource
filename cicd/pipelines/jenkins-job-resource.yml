@@ -1,0 +1,83 @@
+resource_types:
+  - name: discord-resource
+    type: registry-image
+    source:
+      repository: trivigy/discord-resource
+
+resources:
+  - name: jenkins-job-resource
+    type: git
+    icon: github
+    check_every: 30m
+    source:
+      uri: https://github.com/logsquaredn/jenkins-job-resource/
+      branch: master
+
+  - name: jenkins-job-resource-image
+    type: registry-image
+    icon: docker
+    check_every: 1h
+    source: 
+      username: ((docker.username))
+      password: ((docker.password))
+      repository: ((docker.username))/jenkins-job-resource
+
+  - name: notify
+    type: discord-resource
+    icon: discord
+    check_every: 9999h
+    source:
+      token: ((discord.token))
+
+anchors:
+  - &default_job_config
+    build_log_retention:
+      builds: 12
+      minimum_succeeded_builds: 3
+    serial: true
+
+    
+jobs:
+  - name: update-pipeline
+    <<: *default_job_config
+    plan:
+      - get: jenkins-job-resource
+        trigger: true
+
+      - set_pipeline: self
+        file: jenkins-job-resource/cicd/pipelines/jenkins-job-resource.yml
+        var_files: ((var_files))
+
+  - name: build-jenkins-job-resource-image-alpine
+    <<: *default_job_config
+    plan:
+      - get: jenkins-job-resource
+        passed: [update-pipeline]
+        trigger: true
+
+      - put: jenkins-job-resource-image
+        params:
+          build: jenkins-job-resource
+          tag_as_latest: false
+          cache: true
+          dockerfile: dockerfiles/alpine
+          additional_tags: jenkins-job-resource/dockerfiles/alpine/tags
+        get_params:
+          skip_download: true
+
+  - name: build-jenkins-job-resource-image-ubuntu
+    <<: *default_job_config
+    plan:
+      - get: jenkins-job-resource
+        passed: [update-pipeline]
+        trigger: true
+
+      - put: jenkins-job-resource-image
+        params:
+          build: jenkins-job-resource
+          tag_as_latest: false
+          cache: true
+          dockerfile: dockerfiles/ubuntu
+          additional_tags: jenkins-job-resource/dockerfiles/ubuntu/tags
+        get_params:
+          skip_download: true
