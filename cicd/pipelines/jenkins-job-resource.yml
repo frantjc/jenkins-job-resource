@@ -16,7 +16,7 @@ resources:
       branch: master
 
   - name: jenkins-job-resource-image
-    type: registry-image
+    type: docker-image
     icon: docker
     check_every: 1h
     source: 
