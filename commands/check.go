@@ -64,13 +64,13 @@ func (c *Check) Execute() error {
 		if req.Version != nil {
 			for _, build := range builds {
 				if build.Number >= req.Version.Number {
-					resp = append(resp, build)
+					resp = append(resp, build.ToResponse())
 				}
 			}
 		}
 
 		if len(resp) <= 0 {
-			resp = append(resp, builds[len(builds) - 1])
+			resp = append(resp, builds[len(builds) - 1].ToResponse())
 		}
 	}
 

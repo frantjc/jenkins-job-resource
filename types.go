@@ -1,11 +1,29 @@
 package resource
 
+import (
+	"fmt"
+)
+
 type CheckRequest struct {
 	Source Source `json:"source"`
 	Version *Build `json:"version"`
 }
 
-type CheckResponse []Build
+type BuildResponse struct {
+	Number string `json:"number"`
+	URL    string `json:"url"`
+}
+
+func (b *Build) ToResponse() BuildResponse {
+	var resp BuildResponse
+
+	resp.Number = fmt.Sprint(b.Number)
+	resp.URL = b.URL
+
+	return resp
+}
+
+type CheckResponse []BuildResponse
 
 type InRequest struct {
 	Source    Source `json:"source"`
