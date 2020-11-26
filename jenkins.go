@@ -92,34 +92,34 @@ type Job struct {
 }
 
 type JobResponse struct {
-	Description          string `json:"description"`
-	DisplayName          string `json:"displayName"`
-	DisplayNameOrNull    string `json:"displayNameOrNull"`
-	FullDisplayName      string `json:"fullDisplayName"`
-	FullName             string `json:"fullName"`
-	Name                 string `json:"name"`
-	URL                  string `json:"url"`
-	Buildable              bool `json:"buildable"`
-	Builds              []Build `json:"builds"`
-	Color                string `json:"color"`
-	FirstBuild            Build `json:"firstBuild"`
-	HealthReport []HealthReport `json:"healthReport"`
-	InQueue                bool `json:"inQueue"`
-	KeepDependencies       bool `json:"keepDependencies"`
-	LastBuild             Build `json:"lastBuild"`
-	LastCompletedBuild    Build `json:"lastCompletedBuild"`
-	LastFailedBuild       Build `json:"lastFailedBuild"`
-	LastStableBuild       Build `json:"lastStableBuild"`
-	LastSuccessfulBuild   Build `json:"lastSuccessfulBuild"`
-	LastUnstableBuild     Build `json:"lastUnstableBuild"`
-	LastUnsuccessfulBuild Build `json:"lastUnsuccessfulBuild"`
-	NextBuildNumber     float64 `json:"nextBuildNumber"`
-	ConcurrentBuild        bool `json:"concurrentBuild"`
-	ResumeBlocked          bool `json:"resumeBlocked"`
+	// Description           string         `json:"description"`
+	// DisplayName           string         `json:"displayName"`
+	// DisplayNameOrNull     string         `json:"displayNameOrNull,omitempty"`
+	// FullDisplayName       string         `json:"fullDisplayName"`
+	// FullName              string         `json:"fullName"`
+	// Name                  string         `json:"name"`
+	// URL                   string         `json:"url"`
+	// Buildable             bool           `json:"buildable"`
+	Builds                []Build        `json:"builds"`
+	// Color                 string         `json:"color"`
+	// FirstBuild            Build          `json:"firstBuild,omitempty"`
+	// HealthReport          []HealthReport `json:"healthReport,omitempty"`
+	// InQueue               bool           `json:"inQueue"`
+	// KeepDependencies      bool           `json:"keepDependencies"`
+	// LastBuild             Build          `json:"lastBuild,omitempty"`
+	// LastCompletedBuild    Build          `json:"lastCompletedBuild,omitempty"`
+	// LastFailedBuild       Build          `json:"lastFailedBuild,omitempty"`
+	// LastStableBuild       Build          `json:"lastStableBuild,omitempty"`
+	// LastSuccessfulBuild   Build          `json:"lastSuccessfulBuild,omitempty"`
+	// LastUnstableBuild     Build          `json:"lastUnstableBuild,omitempty"`
+	// LastUnsuccessfulBuild Build          `json:"lastUnsuccessfulBuild,omitempty"`
+	// NextBuildNumber       int            `json:"nextBuildNumber"`
+	// ConcurrentBuild       bool           `json:"concurrentBuild"`
+	// ResumeBlocked         bool           `json:"resumeBlocked"`
 }
 
 type Build struct {
-	Number float64 `json:"number"`
+	Number  int    `json:"number"`
 	URL     string `json:"url"`
 }
 
@@ -127,7 +127,7 @@ type HealthReport struct {
 	Description   string `json:"description"`
 	IconClassName string `json:"iconClassName"`
 	IconURL       string `json:"iconUrl"`
-	Score          int64 `json:"score"`
+	Score         int    `json:"score"`
 }
 
 func (j *Job) Build(token string, cause string, params *interface{}) error {
