@@ -1,12 +1,12 @@
 package resource
 
 type CheckRequest struct {
-	Source  Source `json:"source"`
+	Source  Source   `json:"source"`
 	Version *Version `json:"version"`
 }
 
 type Version struct {
-	Number int `json:"number,string"`
+	Number int    `json:"number,string"`
 	URL    string `json:"url"`
 }
 
@@ -33,7 +33,7 @@ type InRequest struct {
 }
 
 type InResponse struct {
-	Version  Version      `json:"version"`
+	Version  Version    `json:"version"`
 	Metadata []Metadata `json:"metadata"`
 }
 
@@ -43,7 +43,7 @@ type OutRequest struct {
 }
 
 type OutResponse struct {
-	Version  Version      `json:"version"`
+	Version  Version    `json:"version"`
 	Metadata []Metadata `json:"metadata"`
 }
 
@@ -62,7 +62,10 @@ type BasicCredentials struct {
 
 type GetParams struct{}
 
-type PutParams struct{}
+type PutParams struct{
+	Cause       string      `json:"cause,omitempty"`
+	BuildParams interface{} `json:"build_params,omitempty"`
+}
 
 type Metadata struct {
 	Name  string `json:"name"`

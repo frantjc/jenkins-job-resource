@@ -1,13 +1,14 @@
 package resource
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/google/go-querystring/query"
 )
 
 func NewJenkins(i *JenkinsInput) (*Jenkins, error) {
@@ -92,35 +93,36 @@ type Job struct {
 }
 
 type JobResponse struct {
-	// Description           string         `json:"description"`
-	// DisplayName           string         `json:"displayName"`
-	// DisplayNameOrNull     string         `json:"displayNameOrNull,omitempty"`
-	// FullDisplayName       string         `json:"fullDisplayName"`
-	// FullName              string         `json:"fullName"`
-	// Name                  string         `json:"name"`
-	// URL                   string         `json:"url"`
-	// Buildable             bool           `json:"buildable"`
+	Description           string         `json:"description"`
+	DisplayName           string         `json:"displayName"`
+	DisplayNameOrNull     string         `json:"displayNameOrNull,omitempty"`
+	FullDisplayName       string         `json:"fullDisplayName"`
+	FullName              string         `json:"fullName"`
+	Name                  string         `json:"name"`
+	URL                   string         `json:"url"`
+	Buildable             bool           `json:"buildable"`
 	Builds                []Build        `json:"builds"`
-	// Color                 string         `json:"color"`
-	// FirstBuild            Build          `json:"firstBuild,omitempty"`
-	// HealthReport          []HealthReport `json:"healthReport,omitempty"`
-	// InQueue               bool           `json:"inQueue"`
-	// KeepDependencies      bool           `json:"keepDependencies"`
-	// LastBuild             Build          `json:"lastBuild,omitempty"`
-	// LastCompletedBuild    Build          `json:"lastCompletedBuild,omitempty"`
-	// LastFailedBuild       Build          `json:"lastFailedBuild,omitempty"`
-	// LastStableBuild       Build          `json:"lastStableBuild,omitempty"`
-	// LastSuccessfulBuild   Build          `json:"lastSuccessfulBuild,omitempty"`
-	// LastUnstableBuild     Build          `json:"lastUnstableBuild,omitempty"`
-	// LastUnsuccessfulBuild Build          `json:"lastUnsuccessfulBuild,omitempty"`
-	// NextBuildNumber       int            `json:"nextBuildNumber"`
-	// ConcurrentBuild       bool           `json:"concurrentBuild"`
-	// ResumeBlocked         bool           `json:"resumeBlocked"`
+	Color                 string         `json:"color"`
+	FirstBuild            Build          `json:"firstBuild,omitempty"`
+	HealthReport          []HealthReport `json:"healthReport,omitempty"`
+	InQueue               bool           `json:"inQueue"`
+	KeepDependencies      bool           `json:"keepDependencies"`
+	LastBuild             Build          `json:"lastBuild,omitempty"`
+	LastCompletedBuild    Build          `json:"lastCompletedBuild,omitempty"`
+	LastFailedBuild       Build          `json:"lastFailedBuild,omitempty"`
+	LastStableBuild       Build          `json:"lastStableBuild,omitempty"`
+	LastSuccessfulBuild   Build          `json:"lastSuccessfulBuild,omitempty"`
+	LastUnstableBuild     Build          `json:"lastUnstableBuild,omitempty"`
+	LastUnsuccessfulBuild Build          `json:"lastUnsuccessfulBuild,omitempty"`
+	NextBuildNumber       int            `json:"nextBuildNumber"`
+	ConcurrentBuild       bool           `json:"concurrentBuild"`
+	ResumeBlocked         bool           `json:"resumeBlocked"`
 }
 
 type Build struct {
 	Number  int    `json:"number"`
 	URL     string `json:"url"`
+	BasicCredentials
 }
 
 type HealthReport struct {
@@ -130,43 +132,58 @@ type HealthReport struct {
 	Score         int    `json:"score"`
 }
 
-func (j *Job) Build(token string, cause string, params *interface{}) error {
-	var body io.Reader
+func (j *Job) Build(token string, cause string, params *interface{}) (*Build, error) {
+	info, err := j.GetInfo()
+
 	url := j.URL
 	if params != nil {
-		buf, err := json.Marshal(params)
-		if err != nil {
-			return err
-		}
-
-		body = bytes.NewBuffer(buf)
 		url += "buildWithParameters"
 	} else {
-		body = nil
 		url += "build"
 	}
 
-	url += fmt.Sprintf("?token=%s", token)
-
-	if cause != "" {
-		url += fmt.Sprintf("&cause=%s", cause)
+	qs, err := query.Values(params)
+	if err != nil {
+		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", url, body)
+	if token != "" {
+		qs.Set("token", token)
+	}
+
+	if cause != "" {
+		qs.Set("cause", cause)
+	}
+
+	url += fmt.Sprintf("?%s", qs.Encode())
+
+	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	c := http.Client{}
 	_, err = c.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	var resp Build
+
+	for newInfo, err := j.GetInfo(); err != nil; newInfo, err = j.GetInfo() {
+		if newInfo.LastBuild.Number != info.LastBuild.Number {
+			resp = newInfo.LastBuild
+			resp.BasicCredentials = j.BasicCredentials
+			break;
+		}
+		
+		time.Sleep(5 * time.Second)
+	}
+
+	return &resp, nil
 }
 
-func (j *Job) GetBuilds() ([]Build, error) {
+func (j *Job) GetInfo() (*JobResponse, error) {
 	req, err := http.NewRequest("GET", j.URL + "api/json/", nil)
 	if err != nil {
 		return nil, err
@@ -187,5 +204,64 @@ func (j *Job) GetBuilds() ([]Build, error) {
 		return nil, err
 	}
 
-	return jResp.Builds, nil
+	return &jResp, nil
+}
+
+func (j *Job) GetBuilds() ([]Build, error) {
+	info, err := j.GetInfo()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, build := range info.Builds {
+		build.BasicCredentials = j.BasicCredentials
+	}
+
+	return info.Builds, nil
+}
+
+type BuildResponse struct {
+	// Artifacts `json:"artifacts"` idk what this looks like
+	Building bool `json:"building"`
+	Description string `json:"Description"`
+	DisplayName string `json:"displayName"`
+	Duration int `json:"duration"`
+	EstimatedDuration int `json:"estimatedDuration"`
+	// Executor `json:"executor"` idk what this looks like
+	FullDisplayName string `json:"fullDisplayName"`
+	ID string `json:"id"`
+	KeepLog bool `json:"keepLog"`
+	Number int `json:"number"`
+	QueueID int `json:"queueId"`
+	Result string `json:"result"`
+	Timestamp int `json:"timestamp"`
+	URL string `json:"url"`
+	// ChangeSets `json:"changeSets"` idk what this looks like
+	// Culprits `json:"culprits"` idk what this looks like
+	NextBuild Build `json:"nextBuild"`
+	PreviousBuild Build `json:"previousBuild"`
+}
+
+func (b *Build) GetInfo() (*BuildResponse, error) {
+	req, err := http.NewRequest("GET", b.URL + "api/json/", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.SetBasicAuth(b.BasicCredentials.Username, b.BasicCredentials.Password)
+
+	c := http.Client{}
+	resp, err := c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	var bResp BuildResponse
+	err = json.NewDecoder(resp.Body).Decode(&bResp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &bResp, nil
 }
