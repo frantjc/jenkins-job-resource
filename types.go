@@ -1,38 +1,25 @@
 package resource
 
-import (
-	"strconv"
-)
-
 type CheckRequest struct {
 	Source  Source `json:"source"`
 	Version *Version `json:"version"`
 }
 
-
 type Version struct {
-	Number string `json:"number,string"`
+	Number int `json:"number,string"`
 	URL    string `json:"url"`
 }
 
 func (v *Version) ToBuild() Build {
-	n, err := strconv.Atoi(v.Number)
-	if err != nil {
-		return Build{
-			Number: 0,
-			URL: v.URL,
-		}
-	}
-
 	return Build{
-		Number: n,
+		Number: v.Number,
 		URL: v.URL,
 	}
 }
 
 func (b *Build) ToVersion() Version {
 	return Version{
-		Number: strconv.Itoa(b.Number),
+		Number: b.Number,
 		URL: b.URL,
 	}
 }

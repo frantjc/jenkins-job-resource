@@ -40,7 +40,7 @@ resources:
       password: ((docker.password))
       repository: ((docker.username))/jenkins-job-resource
 
-  - name: jenkins-job-test
+  - name: jenkins-job-resource-test
     type: jenkins-job-resource
     icon: test-tube
     check_every: 1h
@@ -128,6 +128,4 @@ jobs:
   - name: test-job
     <<: *default_job_config
     plan:
-      - get: jenkins-job-test
-
-
+      - get: jenkins-job-resource-test

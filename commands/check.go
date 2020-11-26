@@ -65,7 +65,7 @@ func (c *Check) Execute() error {
 			for _, build := range builds {
 				version := build.ToVersion()
 				if version.Number >= req.Version.Number {
-					resp = append(resp, build.ToVersion())
+					resp = append([]resource.Version{build.ToVersion()}, resp...)
 				}
 			}
 		}
