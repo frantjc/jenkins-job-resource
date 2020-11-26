@@ -26,7 +26,7 @@ func NewJenkins(i *JenkinsInput) (*Jenkins, error) {
 	return &j, nil
 }
 
-func (j *Jenkins) getJobs() (*[]Job, error) {
+func (j *Jenkins) getJobs() ([]Job, error) {
 	req, err := http.NewRequest("GET", j.URL + "api/json/", nil)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (j *Jenkins) getJobs() (*[]Job, error) {
 		return nil, errors.New("no jobs found")
 	}
 
-	return &jResp.Jobs, nil
+	return jResp.Jobs, nil
 }
 
 func (j *Jenkins) GetJob(name string) (*Job, error) {
@@ -60,7 +60,7 @@ func (j *Jenkins) GetJob(name string) (*Job, error) {
 		return nil, err
 	}
 
-	for _, job := range *jobs {
+	for _, job := range jobs {
 		if strings.EqualFold(job.Name, name) {
 			job.BasicCredentials = j.BasicCredentials
 			return &job, nil

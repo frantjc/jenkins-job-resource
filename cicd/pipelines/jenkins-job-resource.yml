@@ -8,6 +8,7 @@ resource_types:
     type: registry-image
     source:
       repository: logsquaredn/jenkins-job-resource
+      tag: latest
 
 
 

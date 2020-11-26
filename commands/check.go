@@ -62,8 +62,6 @@ func (c *Check) Execute() error {
 
 	if len(builds) > 0 {
 		if req.Version != nil {
-			resp = append(resp, builds[len(builds) - 1])
-		} else {
 			for _, build := range builds {
 				if build.Number >= req.Version.Number {
 					resp = append(resp, build)
@@ -71,7 +69,7 @@ func (c *Check) Execute() error {
 			}
 		}
 
-		if foundResp := len(resp) > 0; !foundResp {
+		if len(resp) <= 0 {
 			resp = append(resp, builds[len(builds) - 1])
 		}
 	}
