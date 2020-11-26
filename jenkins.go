@@ -113,14 +113,14 @@ type JobResponse struct {
 	LastSuccessfulBuild   Build `json:"lastSuccessfulBuild"`
 	LastUnstableBuild     Build `json:"lastUnstableBuild"`
 	LastUnsuccessfulBuild Build `json:"lastUnsuccessfulBuild"`
-	NextBuildNumber       int64 `json:"nextBuildNumber"`
+	NextBuildNumber     float64 `json:"nextBuildNumber"`
 	ConcurrentBuild        bool `json:"concurrentBuild"`
 	ResumeBlocked          bool `json:"resumeBlocked"`
 }
 
 type Build struct {
-	Number int64 `json:"number"`
-	URL   string `json:"url"`
+	Number float64 `json:"number"`
+	URL     string `json:"url"`
 }
 
 type HealthReport struct {
