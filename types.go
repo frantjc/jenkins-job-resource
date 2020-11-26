@@ -1,12 +1,12 @@
 package resource
 
 import (
-	"fmt"
+	"strconv"
 )
 
 type CheckRequest struct {
 	Source  Source `json:"source"`
-	Version *Build `json:"version"`
+	Version *Version `json:"version"`
 }
 
 
@@ -15,9 +15,24 @@ type Version struct {
 	URL    string `json:"url"`
 }
 
+func (v *Version) ToBuild() Build {
+	n, err := strconv.Atoi(v.Number)
+	if err != nil {
+		return Build{
+			Number: 0,
+			URL: v.URL,
+		}
+	}
+
+	return Build{
+		Number: n,
+		URL: v.URL,
+	}
+}
+
 func (b *Build) ToVersion() Version {
 	return Version{
-		Number: fmt.Sprint(b.Number),
+		Number: strconv.Itoa(b.Number),
 		URL: b.URL,
 	}
 }
@@ -27,11 +42,11 @@ type CheckResponse []Version
 type InRequest struct {
 	Source  Source    `json:"source"`
 	Params  GetParams `json:"params"`
-	Version Build     `json:"version"`
+	Version Version   `json:"version"`
 }
 
 type InResponse struct {
-	Version  Build      `json:"version"`
+	Version  Version      `json:"version"`
 	Metadata []Metadata `json:"metadata"`
 }
 
@@ -41,7 +56,7 @@ type OutRequest struct {
 }
 
 type OutResponse struct {
-	Version  Build      `json:"version"`
+	Version  Version      `json:"version"`
 	Metadata []Metadata `json:"metadata"`
 }
 
