@@ -142,7 +142,7 @@ func (j *Job) Build(token string, cause string, params *interface{}) (*Build, er
 		url += "build"
 	}
 
-	qs, err := query.Values(params)
+	qs, err := query.Values(*params)
 	if err != nil {
 		return nil, err
 	}
