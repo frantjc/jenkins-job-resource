@@ -1,2 +1,4 @@
 github.com/google/go-querystring v1.0.0 h1:Xkwi/a1rcvNg1PPYe5vI8GbeBY/jrVuDX5ASuANWTrk=
 github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
+github.com/yosida95/golang-jenkins v0.0.0-20190404125845-4772716c47ca h1:8hboeAcawyX1oasmPxmCFQz5FBVsPcB+I6v1hg04Hxk=
+github.com/yosida95/golang-jenkins v0.0.0-20190404125845-4772716c47ca/go.mod h1:gXUeVZaYWxVZck0zlQrNY4zKyA2tXVKD+9a7rK3f9D0=

@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"io"
 
-	resource "github.com/logsquaredn/jenkins-job-resource"
+	"github.com/logsquaredn/jenkins-job-resource"
+	"github.com/yosida95/golang-jenkins"
 )
 
 type Check struct {
@@ -39,40 +40,36 @@ func (c *Check) Execute() error {
 		return fmt.Errorf("invalid payload: %s", err)
 	}
 
-	// currently impossible to get error here
-	jenk, _ := resource.NewJenkins(&resource.JenkinsInput{
-		URL: req.Source.URL,
-		BasicCredentials: resource.BasicCredentials{
+	jenkins := gojenkins.NewJenkins(
+		&gojenkins.Auth{
 			Username: req.Source.Username,
-			Password: req.Source.Password,
+			ApiToken: req.Source.APIToken,
 		},
-	})
+		req.Source.URL,
+	)
 
-	job, err := jenk.GetJob(req.Source.Job)
+	job, err := jenkins.GetJob(req.Source.Job)
 	if err != nil {
 		return fmt.Errorf("unable to find job %s: %s", req.Source.Job, err)
 	}
 
-	builds, err := job.GetBuilds()
-	if err != nil {
-		return fmt.Errorf("unable to get builds for job %s: %s", req.Source.Job, err)
-	}
+	builds := job.Builds
 
 	var resp resource.CheckResponse
 
 	if len(builds) > 0 {
 		if req.Version != nil {
 			for _, build := range builds {
-				version := build.ToVersion()
+				version := resource.ToVersion(&build)
 				if version.Number >= req.Version.Number {
 					// prepend
-					resp = append([]resource.Version{build.ToVersion()}, resp...)
+					resp = append([]resource.Version{version}, resp...)
 				}
 			}
 		}
 
 		if len(resp) <= 0 {
-			resp = append(resp, builds[0].ToVersion())
+			resp = append(resp, resource.ToVersion(&builds[0]))
 		}
 	}
 

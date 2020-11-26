@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"time"
 
+	goqs "github.com/google/go-querystring/query"
 	"github.com/logsquaredn/jenkins-job-resource"
+	"github.com/yosida95/golang-jenkins"
 )
 
 type Out struct {
@@ -30,6 +33,8 @@ func NewOut(
 	}
 }
 
+const defaultCause = "Default cause"
+
 func (o *Out) Execute() error {
 	var req resource.OutRequest
 
@@ -40,42 +45,65 @@ func (o *Out) Execute() error {
 		return fmt.Errorf("invalid payload: %s", err)
 	}
 
-	// currently impossible to get error here
-	jenk, _ := resource.NewJenkins(&resource.JenkinsInput{
-		URL: req.Source.URL,
-		BasicCredentials: resource.BasicCredentials{
+	jenkins := gojenkins.NewJenkins(
+		&gojenkins.Auth{
 			Username: req.Source.Username,
-			Password: req.Source.Password,
+			ApiToken: req.Source.APIToken,
 		},
-	})
+		req.Source.URL,
+	)
 
-	job, err := jenk.GetJob(req.Source.Job)
+	params, err := goqs.Values(req.Params.BuildParams)
+	if err != nil {
+		return fmt.Errorf("unable to turn build_params into a query string: %s", err)
+	}
+
+	if req.Params.Cause != "" {
+		params.Set("cause", req.Params.Cause)
+	} else {
+		params.Set("cause", defaultCause)
+	}
+
+	if req.Source.Token != "" {
+		params.Set("token", req.Source.Token)
+	} else {
+		return fmt.Errorf("no token supplied to source")
+	}
+
+	job, err := jenkins.GetJob(req.Source.Job)
 	if err != nil {
 		return fmt.Errorf("unable to find job %s: %s", req.Source.Job, err)
 	}
 
+	err = jenkins.Build(job, params)
+	if err != nil {
+		return fmt.Errorf("unable to trigger build payload: %s", err)
+	}
+
 	var resp resource.OutResponse
 
-	build, err := job.Build(req.Source.Token, req.Params.Cause, &req.Params.BuildParams)
-	if err != nil {
-		return fmt.Errorf("unable to build job %s: %s", req.Source.Job, err)
+	for updatedJob, err := jenkins.GetJob(req.Source.Job); resp.Version.Number == 0 ; updatedJob, err = jenkins.GetJob(req.Source.Job) {
+		if err != nil {
+			return fmt.Errorf("unable to find job %s after triggering build: %s", req.Source.Job, err)
+		}
+		
+		if updatedJob.LastCompletedBuild.Number > job.LastCompletedBuild.Number {
+			resp.Version = resource.ToVersion(&updatedJob.LastCompletedBuild)
+			resp.Metadata = []resource.Metadata{
+				{ Name: "description", Value: updatedJob.LastCompletedBuild.Description },
+				{ Name: "displayName", Value: updatedJob.LastCompletedBuild.FullDisplayName },
+				{ Name: "id", Value: updatedJob.LastCompletedBuild.Id },
+				{ Name: "url", Value: updatedJob.LastCompletedBuild.Url },
+				{ Name: "duration", Value: strconv.Itoa(updatedJob.LastCompletedBuild.Duration) },
+				{ Name: "estimatedDuration", Value: strconv.Itoa(updatedJob.LastCompletedBuild.EstimatedDuration) },
+			}
+		} else {
+			time.Sleep(5 * time.Second)
+		}
 	}
 
-	resp.Version = build.ToVersion()
 
-	info, err := build.GetInfo()
-	if err != nil {
-		return fmt.Errorf("unable to get metadata for build %d: %s", build.Number, err)
-	}
 
-	resp.Metadata = []resource.Metadata{
-		{ Name: "description", Value: info.Description },
-		{ Name: "displayName", Value: info.DisplayName },
-		{ Name: "id", Value: info.ID },
-		{ Name: "url", Value: info.URL },
-		{ Name: "duration", Value: strconv.Itoa(info.Duration) },
-		{ Name: "estimatedDuration", Value: strconv.Itoa(info.EstimatedDuration) },
-	}
 
 	err = json.NewEncoder(o.stdout).Encode(resp)
 	if err != nil {

@@ -1,5 +1,9 @@
 package resource
 
+import (
+	"github.com/yosida95/golang-jenkins"
+)
+
 type CheckRequest struct {
 	Source  Source   `json:"source"`
 	Version *Version `json:"version"`
@@ -10,17 +14,17 @@ type Version struct {
 	URL    string `json:"url"`
 }
 
-func (v *Version) ToBuild() Build {
-	return Build{
+func ToBuild(v *Version) gojenkins.Build {
+	return gojenkins.Build{
 		Number: v.Number,
-		URL: v.URL,
+		Url: v.URL,
 	}
 }
 
-func (b *Build) ToVersion() Version {
+func ToVersion(b *gojenkins.Build) Version {
 	return Version{
 		Number: b.Number,
-		URL: b.URL,
+		URL: b.Url,
 	}
 }
 
@@ -50,14 +54,9 @@ type OutResponse struct {
 type Source struct {
 	URL string `json:"url"`
 	Job string `json:"job"`
-
-	BasicCredentials
-	Token string `json:"token"`
-}
-
-type BasicCredentials struct {
 	Username string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
+	APIToken string `json:"api_token,omitempty"`
+	Token string `json:"token"`
 }
 
 type GetParams struct{}

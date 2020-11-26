@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/logsquaredn/jenkins-job-resource"
+	"github.com/yosida95/golang-jenkins"
 )
 
 type In struct {
@@ -40,43 +41,34 @@ func (i *In) Execute() error {
 		return fmt.Errorf("invalid payload: %s", err)
 	}
 
-	// currently impossible to get error here
-	jenk, _ := resource.NewJenkins(&resource.JenkinsInput{
-		URL: req.Source.URL,
-		BasicCredentials: resource.BasicCredentials{
+	jenkins := gojenkins.NewJenkins(
+		&gojenkins.Auth{
 			Username: req.Source.Username,
-			Password: req.Source.Password,
+			ApiToken: req.Source.APIToken,
 		},
-	})
+		req.Source.URL,
+	)
 
-	job, err := jenk.GetJob(req.Source.Job)
+	job, err := jenkins.GetJob(req.Source.Job)
 	if err != nil {
 		return fmt.Errorf("unable to find job %s: %s", req.Source.Job, err)
 	}
 
-	builds, err := job.GetBuilds()
-	if err != nil {
-		return fmt.Errorf("unable to get builds for job %s: %s", req.Source.Job, err)
-	}
+	builds := job.Builds
 
 	var resp resource.InResponse
 
 	if len(builds) > 0 {
 		build := builds[0]
-		resp.Version = build.ToVersion()
-
-		info, err := build.GetInfo()
-		if err != nil {
-			return fmt.Errorf("unable to get metadata for build %d: %s", build.Number, err)
-		}
+		resp.Version = resource.ToVersion(&build)
 		
 		resp.Metadata = []resource.Metadata{
-			{ Name: "description", Value: info.Description },
-			{ Name: "displayName", Value: info.DisplayName },
-			{ Name: "id", Value: info.ID },
-			{ Name: "url", Value: info.URL },
-			{ Name: "duration", Value: strconv.Itoa(info.Duration) },
-			{ Name: "estimatedDuration", Value: strconv.Itoa(info.EstimatedDuration) },
+			{ Name: "description", Value: build.Description },
+			{ Name: "displayName", Value: build.FullDisplayName },
+			{ Name: "id", Value: build.Id },
+			{ Name: "url", Value: build.Url },
+			{ Name: "duration", Value: strconv.Itoa(build.Duration) },
+			{ Name: "estimatedDuration", Value: strconv.Itoa(build.EstimatedDuration) },
 		}
 	}
 
