@@ -113,21 +113,21 @@ type JobResponse struct {
 	LastSuccessfulBuild   Build `json:"lastSuccessfulBuild"`
 	LastUnstableBuild     Build `json:"lastUnstableBuild"`
 	LastUnsuccessfulBuild Build `json:"lastUnsuccessfulBuild"`
-	NextBuildNumber         int `json:"nextBuildNumber"`
+	NextBuildNumber       int64 `json:"nextBuildNumber"`
 	ConcurrentBuild        bool `json:"concurrentBuild"`
 	ResumeBlocked          bool `json:"resumeBlocked"`
 }
 
 type Build struct {
-	Number int `json:"number"`
-	URL string `json:"url"`
+	Number int64 `json:"number"`
+	URL   string `json:"url"`
 }
 
 type HealthReport struct {
 	Description   string `json:"description"`
 	IconClassName string `json:"iconClassName"`
 	IconURL       string `json:"iconUrl"`
-	Score            int `json:"score"`
+	Score          int64 `json:"score"`
 }
 
 func (j *Job) Build(token string, cause string, params *interface{}) error {
