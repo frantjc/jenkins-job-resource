@@ -44,8 +44,10 @@ var _ = Describe("Check", func () {
 
 		cmdErr = cmd.Run()
 
-		err = json.Unmarshal(outBuf.Bytes(), &resp)
-		Expect(err).ToNot(HaveOccurred())
+		if cmdErr == nil {
+			err = json.Unmarshal(outBuf.Bytes(), &resp)
+			Expect(err).ToNot(HaveOccurred())
+		}
 	})
 
 	Context("when called with no version", func() {

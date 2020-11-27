@@ -156,6 +156,10 @@ jobs:
 
   - name: build-jenkins-job-resource-image-ubuntu
     <<: *default_job_config
+    on_success:
+      put: version
+      params:
+        bump: patch
     plan:
       - in_parallel:
         - get: jenkins-job-resource
@@ -164,22 +168,17 @@ jobs:
 
         - get: version
 
-      - in_parallel:
-        - put: jenkins-job-resource-image-ubuntu
-          params:
-            build: jenkins-job-resource/
-            tag_as_latest: true
-            cache: true
-            dockerfile: jenkins-job-resource/dockerfiles/ubuntu/Dockerfile
-            additional_tags: jenkins-job-resource/dockerfiles/ubuntu/tags
-            build_args:
-              <<: *build_args
-          get_params:
-            skip_download: true
-
-        - put: version
-          params:
-            bump: patch
+      - put: jenkins-job-resource-image-ubuntu
+        params:
+          build: jenkins-job-resource/
+          tag_as_latest: true
+          cache: true
+          dockerfile: jenkins-job-resource/dockerfiles/ubuntu/Dockerfile
+          additional_tags: jenkins-job-resource/dockerfiles/ubuntu/tags
+          build_args:
+            <<: *build_args
+        get_params:
+          skip_download: true
 
 
   - name: trigger-build

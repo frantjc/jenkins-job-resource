@@ -45,8 +45,10 @@ var _ = Describe("Out", func () {
 
 		cmdErr = cmd.Run()
 
-		err = json.Unmarshal(outBuf.Bytes(), &resp)
-		Expect(err).ToNot(HaveOccurred())
+		if cmdErr == nil {
+			err = json.Unmarshal(outBuf.Bytes(), &resp)
+			Expect(err).ToNot(HaveOccurred())
+		}
 	})
 
 	Context("with no params", func() {
