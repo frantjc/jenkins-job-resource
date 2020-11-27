@@ -11,8 +11,11 @@ import (
 	"github.com/yosida95/golang-jenkins"
 )
 
-const defaultCause = "Default cause"
+const defaultCause = "Triggered by Concourse"
+const defaultDescription = "Build triggered by Concourse"
 
+// Out runs the in script which checks stdin for a JSON object of the form of an OutRequest
+// triggers a new build and then fetches and writes it as well as Metadata about it to stdout
 func (c *Command) Out() error {
 	var req resource.OutRequest
 
@@ -67,6 +70,11 @@ func (c *Command) Out() error {
 
 		lastBuild := jobAfterBuild.LastCompletedBuild
 		if lastBuild.Number > job.LastCompletedBuild.Number {
+			err = jenkins.SetBuildDescription(lastBuild, defaultDescription)
+			if err != nil {
+				// Do I care?
+			}
+
 			resp.Version = resource.ToVersion(&lastBuild)
 			resp.Metadata = []resource.Metadata{
 				{ Name: "description", Value: lastBuild.Description },

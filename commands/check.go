@@ -8,6 +8,8 @@ import (
 	"github.com/yosida95/golang-jenkins"
 )
 
+// Check runs the in script which checks stdin for a JSON object of the form of a CheckRequest
+// fetches and writes the all Versions that are newer than the provided Version to stdout
 func (c *Command) Check() error {
 	var req resource.CheckRequest
 
