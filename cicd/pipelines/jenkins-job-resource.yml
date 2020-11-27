@@ -136,9 +136,10 @@ jobs:
           inputs:
             - name: jenkins-job-resource
           run:
-            path: go
+            path: sh
             args:
-              - test
+              - -exc
+              - CGO_ENABLED=0 go test
             dir: jenkins-job-resource
 
 
