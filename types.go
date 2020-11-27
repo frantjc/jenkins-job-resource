@@ -31,6 +31,27 @@ type InResponse struct {
 type OutRequest struct {
 	Source Source    `json:"source"`
 	Params PutParams `json:"params"`
+	GetParams 		 `json:"get_params"`
+}
+
+const defaultCause = "Triggered by Concourse"
+// Cause returns the given cause or the default cause
+func (req *OutRequest) Cause() string {
+	if req.Params.Cause != "" {
+		return req.Params.Cause
+	}
+
+	return defaultCause
+}
+
+const defaultDescription = "Build triggered by Concourse"
+// Description returns the given description or the default description
+func (req *OutRequest) Description() string {
+	if req.Params.Description != "" {
+		return req.Params.Description
+	}
+
+	return defaultDescription
 }
 
 // OutResponse is the JSON object that we pass back to Concourse through stdout from /opt/resource/out

@@ -87,7 +87,6 @@ func (j *JenkinsJobResource) newJenkins(s resource.Source) *gojenkins.Jenkins {
 	)
 }
 
-// getVersion converts Build to Version to transfer infromation from Jenkins to Concourse
 func (j *JenkinsJobResource) getVersion(b *gojenkins.Build) resource.Version {
 	return resource.Version{
 		Number: b.Number,

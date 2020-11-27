@@ -173,5 +173,4 @@ jobs:
     <<: *default_job_config
     plan:
       - get: jenkins-job-resource-test
-        passed: [build-jenkins-job-resource-image-ubuntu]
         trigger: true

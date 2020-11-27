@@ -8,9 +8,6 @@ import (
 	resource "github.com/logsquaredn/jenkins-job-resource"
 )
 
-const defaultCause = "Triggered by Concourse"
-const defaultDescription = "Build triggered by Concourse"
-
 // Out runs the in script which checks stdin for a JSON object of the form of an OutRequest
 // triggers a new build and then fetches and writes it as well as Metadata about it to stdout
 func (j *JenkinsJobResource) Out() error {
@@ -36,11 +33,7 @@ func (j *JenkinsJobResource) Out() error {
 		return fmt.Errorf("unable to turn build_params into a query string: %s", err)
 	}
 
-	if req.Params.Cause != "" {
-		params.Set("cause", req.Params.Cause)
-	} else {
-		params.Set("cause", defaultCause)
-	}
+	params.Set("cause", req.Cause())
 
 	if req.Source.Token != "" {
 		params.Set("token", req.Source.Token)
@@ -56,7 +49,7 @@ func (j *JenkinsJobResource) Out() error {
 	for {
 		if build, err := jenkins.GetBuild(job, job.LastCompletedBuild.Number + 1); err == nil {
 			// currently don't care if there is an error here
-			jenkins.SetBuildDescription(build, req.Params.Description)
+			jenkins.SetBuildDescription(build, req.Description())
 
 			resp.Version = j.getVersion(&build)
 			resp.Metadata = j.getMetadata(&build)
