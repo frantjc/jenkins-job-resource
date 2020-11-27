@@ -86,10 +86,6 @@ func (c *Command) Out() error {
 				{ Name: "result", Value: lastBuild.Result },
 			}
 
-			if lastBuild.Result != "SUCCESS" {
-				return fmt.Errorf("%s %s resulted in %s", req.Source.Job, lastBuild.Id, lastBuild.Result)
-			}
-
 			break;
 		} else {
 			time.Sleep(5 * time.Second)

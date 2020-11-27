@@ -165,7 +165,6 @@ jobs:
 
         - put: version
           params:
-            file: version/version
             bump: patch
 
 
