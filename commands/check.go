@@ -3,34 +3,12 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 
 	"github.com/logsquaredn/jenkins-job-resource"
 	"github.com/yosida95/golang-jenkins"
 )
 
-type Check struct {
-	stdin  io.Reader
-	stderr io.Writer
-	stdout io.Writer
-	args   []string
-}
-
-func NewCheck(
-	stdin io.Reader,
-	stderr io.Writer,
-	stdout io.Writer,
-	args []string,
-) *Check {
-	return &Check{
-		stdin,
-		stderr,
-		stdout,
-		args,
-	}
-}
-
-func (c *Check) Execute() error {
+func (c *Command) Check() error {
 	var req resource.CheckRequest
 
 	decoder := json.NewDecoder(c.stdin)

@@ -8,14 +8,14 @@ import (
 )
 
 func main() {
-	command := commands.NewIn(
+	command := commands.NewCommand(
 		os.Stdin,
 		os.Stderr,
 		os.Stdout,
 		os.Args,
 	)
 
-	err := command.Execute()
+	err := command.In()
 	if err != nil {
 		log.Fatal(err)
 	}

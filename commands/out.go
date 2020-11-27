@@ -3,7 +3,6 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"strconv"
 	"time"
 
@@ -12,33 +11,12 @@ import (
 	"github.com/yosida95/golang-jenkins"
 )
 
-type Out struct {
-	stdin  io.Reader
-	stderr io.Writer
-	stdout io.Writer
-	args   []string
-}
-
-func NewOut(
-	stdin io.Reader,
-	stderr io.Writer,
-	stdout io.Writer,
-	args []string,
-) *Out {
-	return &Out{
-		stdin:  stdin,
-		stderr: stderr,
-		stdout: stdout,
-		args:   args,
-	}
-}
-
 const defaultCause = "Default cause"
 
-func (o *Out) Execute() error {
+func (c *Command) Out() error {
 	var req resource.OutRequest
 
-	decoder := json.NewDecoder(o.stdin)
+	decoder := json.NewDecoder(c.stdin)
 	decoder.DisallowUnknownFields()
 	err := decoder.Decode(&req)
 	if err != nil {
@@ -82,11 +60,12 @@ func (o *Out) Execute() error {
 
 	var resp resource.OutResponse
 
-	for lastBuild, err := jenkins.GetLastBuild(job); resp.Version.Number == 0 ; lastBuild, err = jenkins.GetLastBuild(job) {
+	for jobAfterBuild, err := jenkins.GetJob(req.Source.Job); resp.Version.Number == 0; jobAfterBuild, err = jenkins.GetJob(req.Source.Job) {
 		if err != nil {
 			return fmt.Errorf("unable to find job %s after triggering build: %s", req.Source.Job, err)
 		}
-		
+
+		lastBuild := jobAfterBuild.LastCompletedBuild
 		if lastBuild.Number > job.LastCompletedBuild.Number {
 			resp.Version = resource.ToVersion(&lastBuild)
 			resp.Metadata = []resource.Metadata{
@@ -96,13 +75,20 @@ func (o *Out) Execute() error {
 				{ Name: "url", Value: lastBuild.Url },
 				{ Name: "duration", Value: strconv.Itoa(lastBuild.Duration) },
 				{ Name: "estimatedDuration", Value: strconv.Itoa(lastBuild.EstimatedDuration) },
+				{ Name: "result", Value: lastBuild.Result },
 			}
+
+			if lastBuild.Result != "SUCCESS" {
+				return fmt.Errorf("%s %s resulted in %s", req.Source.Job, lastBuild.Id, lastBuild.Result)
+			}
+
+			break;
 		} else {
 			time.Sleep(5 * time.Second)
 		}
 	}
 
-	err = json.NewEncoder(o.stdout).Encode(resp)
+	err = json.NewEncoder(c.stdout).Encode(resp)
 	if err != nil {
 		return fmt.Errorf("could not marshal JSON: %s", err)
 	}
