@@ -31,7 +31,6 @@ type InResponse struct {
 type OutRequest struct {
 	Source Source    `json:"source"`
 	Params PutParams `json:"params"`
-	GetParams 		 `json:"get_params"`
 }
 
 const defaultCause = "Triggered by Concourse"

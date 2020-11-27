@@ -57,12 +57,11 @@ func (j *JenkinsJobResource) writeOutput(resp interface{}) error {
 func (j *JenkinsJobResource) getMetadata(build *gojenkins.Build) []resource.Metadata {
 	if build != nil {
 		return []resource.Metadata{
-			{Name: "description", Value: build.Description},
-			{Name: "displayName", Value: build.FullDisplayName},
+			{Name: "name", Value: build.FullDisplayName},
 			{Name: "id", Value: build.Id},
 			{Name: "url", Value: build.Url},
 			{Name: "duration", Value: strconv.Itoa(build.Duration)},
-			{Name: "estimatedDuration", Value: strconv.Itoa(build.EstimatedDuration)},
+			{Name: "expectedDuration", Value: strconv.Itoa(build.EstimatedDuration)},
 			{Name: "result", Value: build.Result},
 		}
 	}

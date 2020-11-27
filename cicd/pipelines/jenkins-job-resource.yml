@@ -95,10 +95,10 @@ anchors:
 
 groups:
   - name: ci
-    jobs: [update-pipeline, test-jenkins-job-resource, build-jenkins-job-resource-image-alpine, build-jenkins-job-resource-image-ubuntu]
+    jobs: [update-pipeline, build-jenkins-job-resource-image-alpine, build-jenkins-job-resource-image-ubuntu]
 
   - name: test
-    jobs: [test-job]
+    jobs: [trigger-build, get-build]
 
 
 
@@ -118,37 +118,12 @@ jobs:
         var_files: ((var_files))
 
 
-  - name: test-jenkins-job-resource
-    <<: *default_job_config
-    plan:
-      - get: jenkins-job-resource
-        passed: [update-pipeline]
-        trigger: true
-
-      - task: go-test
-        config:
-          platform: linux
-          image_resource:
-            type: registry-image
-            source:
-              repository: golang
-              tag: alpine
-          inputs:
-            - name: jenkins-job-resource
-          run:
-            path: sh
-            args:
-              - -exc
-              - CGO_ENABLED=0 go test
-            dir: jenkins-job-resource
-
-
   - name: build-jenkins-job-resource-image-alpine
     <<: *default_job_config
     plan:
       - in_parallel:
         - get: jenkins-job-resource
-          passed: [test-jenkins-job-resource]
+          passed: [update-pipeline]
           trigger: true
 
         - get: version
@@ -169,7 +144,7 @@ jobs:
     plan:
       - in_parallel:
         - get: jenkins-job-resource
-          passed: [test-jenkins-job-resource]
+          passed: [update-pipeline]
           trigger: true
 
         - get: version
@@ -185,19 +160,24 @@ jobs:
           get_params:
             skip_download: true
 
-        - put: jenkins-job-resource-test
-          params:
-            cause: Concourse trigger
-
         - put: version
           params:
             bump: patch
 
 
-  - name: test-job
+  - name: trigger-build
+    <<: *default_job_config
+    plan:
+      - put: jenkins-job-resource-test
+        params:
+          cause: Concourse trigger
+
+
+  - name: get-build
     <<: *default_job_config
     plan:
       - get: jenkins-job-resource-test
+        passed: [trigger-build]
         trigger: true
 
       - task: check-input

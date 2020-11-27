@@ -1,0 +1,20 @@
+pipeline {
+    agent 'any'
+
+    stages {
+        stage("Stage") {
+            steps {
+                sh '''
+                    touch output.txt
+                    echo "hello" > output.txt
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: '*.txt'
+        }
+    }
+}

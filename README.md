@@ -43,7 +43,7 @@ jobs:
 | `username`  | unknown, but likely |                          | a username that can be used to authorize with the given Jenkins url    |
 | `login`     | unknown, but likely |                          | either the password or an api token associated with the given username |
 
-> _Note: if_ `login` _is set to a password, then surely_ `username` _must be set to a corresponding username for it to have any effect. If_ `login` _is set to an api token, it is unknown if_ `username` _need be set to a corresponding username. It is unknown if a Jenkins deployment can be configured such that both_ `username` _and_ `login` _are not required_
+> _Note: if_ `login` _is set, then surely_ `username` _must be set to a corresponding username for it to have any effect. It is unknown if a Jenkins deployment can be configured such that both_ `username` _and_ `login` _are not required_
 
 TODO: Jenkins configuration guide
 
