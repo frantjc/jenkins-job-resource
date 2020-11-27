@@ -95,10 +95,11 @@ anchors:
 
 groups:
   - name: ci
-    jobs: [update-pipeline, build-jenkins-job-resource-image-alpine, build-jenkins-job-resource-image-ubuntu]
+    jobs: [update-pipeline, test-jenkins-job-resource, build-jenkins-job-resource-image-alpine, build-jenkins-job-resource-image-ubuntu]
 
   - name: test
     jobs: [test-job]
+
 
 
 jobs:
@@ -117,12 +118,35 @@ jobs:
         var_files: ((var_files))
 
 
+  - name: test-jenkins-job-resource
+    <<: *default_job_config
+    plan:
+      - get: jenkins-job-resource
+        passed: [update-pipeline]
+        trigger: true
+
+      - task: go-test
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: golang
+              tag: alpine
+          inputs:
+            - name: jenkins-job-resource
+          run:
+            path: go
+            args:
+              - test
+
+
   - name: build-jenkins-job-resource-image-alpine
     <<: *default_job_config
     plan:
       - in_parallel:
         - get: jenkins-job-resource
-          passed: [update-pipeline]
+          passed: [test-jenkins-job-resource]
           trigger: true
 
         - get: version
@@ -143,7 +167,7 @@ jobs:
     plan:
       - in_parallel:
         - get: jenkins-job-resource
-          passed: [update-pipeline]
+          passed: [test-jenkins-job-resource]
           trigger: true
 
         - get: version
@@ -168,9 +192,23 @@ jobs:
             bump: patch
 
 
-
   - name: test-job
     <<: *default_job_config
     plan:
       - get: jenkins-job-resource-test
         trigger: true
+
+      - task: check-input
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: alpine
+          inputs:
+            - name: jenkins-job-resource-test
+          run:
+            path: sh
+            args:
+              - -exc
+              - ls; ls jenkins-job-resource-test
