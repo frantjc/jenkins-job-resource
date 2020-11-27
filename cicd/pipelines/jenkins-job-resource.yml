@@ -91,6 +91,13 @@ anchors:
       minimum_succeeded_builds: 3
     serial: true
 
+  - &build_args
+    JENKINS_URL: ((jenkins.url))
+    JENKINS_JOB: ((jenkins.job.name))
+    JENKINS_JOB_TOKEN: ((jenkins.job.token))
+    JENKINS_USERNAME: ((jenkins.username))
+    JENKINS_API_TOKEN: ((jenkins.api_token))
+
 
 
 groups:
@@ -135,6 +142,8 @@ jobs:
           cache: true
           dockerfile: jenkins-job-resource/dockerfiles/alpine/Dockerfile
           additional_tags: jenkins-job-resource/dockerfiles/alpine/tags
+          build_args:
+            <<: *build_args
         get_params:
           skip_download: true
 
@@ -157,6 +166,8 @@ jobs:
             cache: true
             dockerfile: jenkins-job-resource/dockerfiles/ubuntu/Dockerfile
             additional_tags: jenkins-job-resource/dockerfiles/ubuntu/tags
+            build_args:
+              <<: *build_args
           get_params:
             skip_download: true
 
