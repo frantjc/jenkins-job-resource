@@ -139,6 +139,7 @@ jobs:
             path: go
             args:
               - test
+            dir: jenkins-job-resource
 
 
   - name: build-jenkins-job-resource-image-alpine
