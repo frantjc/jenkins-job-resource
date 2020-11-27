@@ -82,28 +82,25 @@ func (o *Out) Execute() error {
 
 	var resp resource.OutResponse
 
-	for updatedJob, err := jenkins.GetJob(req.Source.Job); resp.Version.Number == 0 ; updatedJob, err = jenkins.GetJob(req.Source.Job) {
+	for lastBuild, err := jenkins.GetLastBuild(job); resp.Version.Number == 0 ; lastBuild, err = jenkins.GetLastBuild(job) {
 		if err != nil {
 			return fmt.Errorf("unable to find job %s after triggering build: %s", req.Source.Job, err)
 		}
 		
-		if updatedJob.LastCompletedBuild.Number > job.LastCompletedBuild.Number {
-			resp.Version = resource.ToVersion(&updatedJob.LastCompletedBuild)
+		if lastBuild.Number > job.LastCompletedBuild.Number {
+			resp.Version = resource.ToVersion(&lastBuild)
 			resp.Metadata = []resource.Metadata{
-				{ Name: "description", Value: updatedJob.LastCompletedBuild.Description },
-				{ Name: "displayName", Value: updatedJob.LastCompletedBuild.FullDisplayName },
-				{ Name: "id", Value: updatedJob.LastCompletedBuild.Id },
-				{ Name: "url", Value: updatedJob.LastCompletedBuild.Url },
-				{ Name: "duration", Value: strconv.Itoa(updatedJob.LastCompletedBuild.Duration) },
-				{ Name: "estimatedDuration", Value: strconv.Itoa(updatedJob.LastCompletedBuild.EstimatedDuration) },
+				{ Name: "description", Value: lastBuild.Description },
+				{ Name: "displayName", Value: lastBuild.FullDisplayName },
+				{ Name: "id", Value: lastBuild.Id },
+				{ Name: "url", Value: lastBuild.Url },
+				{ Name: "duration", Value: strconv.Itoa(lastBuild.Duration) },
+				{ Name: "estimatedDuration", Value: strconv.Itoa(lastBuild.EstimatedDuration) },
 			}
 		} else {
 			time.Sleep(5 * time.Second)
 		}
 	}
-
-
-
 
 	err = json.NewEncoder(o.stdout).Encode(resp)
 	if err != nil {

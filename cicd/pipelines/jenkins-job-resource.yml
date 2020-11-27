@@ -48,8 +48,32 @@ resources:
       url: ((jenkins.url))
       job: ((jenkins.job.name))
       username: ((jenkins.username))
-      password: ((jenkins.password))
+      api_token: ((jenkins.api_token))
       token: ((jenkins.job.token))
+
+  - name: version
+    type: semver
+    icon: tag
+    check_every: 9999h
+    source:
+      initial_version: 0.0.1
+      driver: s3
+      bucket: ((aws.s3.bucket))
+      key: ((aws.s3.keys.version))
+      access_key_id: ((aws.s3.access_key.id))
+      secret_access_key: ((aws.s3.access_key.secret))
+      region_name: ((aws.s3.region))
+
+  - name: vars
+    type: s3
+    icon: cog
+    check_every: 30m
+    source:
+      bucket: ((aws.s3.bucket))
+      regexp: ((aws.s3.keys.vars))
+      access_key_id: ((aws.s3.access_key.id))
+      secret_access_key: ((aws.s3.access_key.secret))
+      region_name: ((aws.s3.region))
 
   # - name: notify
   #   type: discord-resource
@@ -70,7 +94,7 @@ anchors:
 
 
 groups:
-  - name: build
+  - name: ci
     jobs: [update-pipeline, build-jenkins-job-resource-image-alpine, build-jenkins-job-resource-image-ubuntu]
 
   - name: test
@@ -81,20 +105,27 @@ jobs:
   - name: update-pipeline
     <<: *default_job_config
     plan:
-      - get: jenkins-job-resource
-        trigger: true
+      - in_parallel:
+        - get: jenkins-job-resource
+          trigger: true
 
-      # - set_pipeline: self
-      #   file: jenkins-job-resource/cicd/pipelines/jenkins-job-resource.yml
-      #   var_files: ((var_files))
+        - get: vars
+          trigger: true
+
+      - set_pipeline: self
+        file: jenkins-job-resource/cicd/pipelines/jenkins-job-resource.yml
+        var_files: ((var_files))
 
 
   - name: build-jenkins-job-resource-image-alpine
     <<: *default_job_config
     plan:
-      - get: jenkins-job-resource
-        passed: [update-pipeline]
-        trigger: true
+      - in_parallel:
+        - get: jenkins-job-resource
+          passed: [update-pipeline]
+          trigger: true
+
+        - get: version
 
       - put: jenkins-job-resource-image-alpine
         params:
@@ -110,23 +141,33 @@ jobs:
   - name: build-jenkins-job-resource-image-ubuntu
     <<: *default_job_config
     plan:
-      - get: jenkins-job-resource
-        passed: [update-pipeline]
-        trigger: true
+      - in_parallel:
+        - get: jenkins-job-resource
+          passed: [update-pipeline]
+          trigger: true
 
-      - put: jenkins-job-resource-image-ubuntu
-        params:
-          build: jenkins-job-resource/
-          tag_as_latest: true
-          cache: true
-          dockerfile: jenkins-job-resource/dockerfiles/ubuntu/Dockerfile
-          additional_tags: jenkins-job-resource/dockerfiles/ubuntu/tags
-        get_params:
-          skip_download: true
+        - get: version
 
-      - put: jenkins-job-resource-test
-        params:
-          cause: Concourse trigger
+      - in_parallel:
+        - put: jenkins-job-resource-image-ubuntu
+          params:
+            build: jenkins-job-resource/
+            tag_as_latest: true
+            cache: true
+            dockerfile: jenkins-job-resource/dockerfiles/ubuntu/Dockerfile
+            additional_tags: jenkins-job-resource/dockerfiles/ubuntu/tags
+          get_params:
+            skip_download: true
+
+        - put: jenkins-job-resource-test
+          params:
+            cause: Concourse trigger
+
+        - put: version
+          params:
+            file: version/version
+            bump: patch
+
 
 
   - name: test-job
