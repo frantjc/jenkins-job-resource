@@ -40,6 +40,7 @@ func (j *JenkinsJobResource) In() error {
 		return fmt.Errorf("unable to find job %s: %s", req.Source.Job, err)
 	}
 
+	// TODO: fail on unsuccessful build?
 	build, err := jenkins.GetBuild(job, req.Version.Number)
 	if err != nil {
 		return fmt.Errorf("requested version of resource %d unavailable: %s", req.Version.Number, err)

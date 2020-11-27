@@ -47,8 +47,9 @@ func (j *JenkinsJobResource) Out() error {
 	}
 
 	for {
+		// TODO: fail on unsuccessful build?
 		if build, err := jenkins.GetBuild(job, job.LastCompletedBuild.Number + 1); err == nil {
-			// currently don't care if there is an error here
+			// TODO: do I care if there is an error here?
 			jenkins.SetBuildDescription(build, req.Description())
 
 			resp.Version = j.getVersion(&build)

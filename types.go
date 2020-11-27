@@ -8,6 +8,7 @@ type CheckRequest struct {
 
 // Version is the JSON object that is passed to and from Concourse
 type Version struct {
+	// TODO: change to build?
 	Number int    `json:"number,string"`
 }
 
