@@ -75,12 +75,12 @@ resources:
       secret_access_key: ((aws.s3.access_key.secret))
       region_name: ((aws.s3.region))
 
-  # - name: notify
-  #   type: discord-resource
-  #   icon: discord
-  #   check_every: 9999h
-  #   source:
-  #     token: ((discord.token))
+  - name: notify
+    type: discord-resource
+    icon: discord
+    check_every: 9999h
+    source:
+      token: ((discord.token))
 
 
 
@@ -90,6 +90,12 @@ anchors:
       builds: 12
       minimum_succeeded_builds: 3
     serial: true
+    on_failure:
+      put: notify
+      params:
+        channel: ((discord.channel))
+        title: pipeline failed
+        message: jenkins-job-resource
 
   - &build_args
     JENKINS_URL: ((jenkins.url))
