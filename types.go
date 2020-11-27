@@ -1,9 +1,5 @@
 package resource
 
-import (
-	"github.com/yosida95/golang-jenkins"
-)
-
 // CheckRequest is the JSON object that Concourse passes to /opt/resource/check through stdin
 type CheckRequest struct {
 	Source  Source   `json:"source"`
@@ -13,13 +9,6 @@ type CheckRequest struct {
 // Version is the JSON object that is passed to and from Concourse
 type Version struct {
 	Number int    `json:"number,string"`
-}
-
-// ToVersion converts Build to Version to transfer infromation from Jenkins to Concourse
-func ToVersion(b *gojenkins.Build) Version {
-	return Version{
-		Number: b.Number,
-	}
 }
 
 // CheckResponse is the JSON object that we pass back to Concourse through stdout from /opt/resource/check
@@ -55,7 +44,7 @@ type Source struct {
 	URL string `json:"url"`
 	Job string `json:"job"`
 	Username string `json:"username,omitempty"`
-	APIToken string `json:"api_token,omitempty"`
+	Login string `json:"login,omitempty"`
 	Token string `json:"token"`
 }
 

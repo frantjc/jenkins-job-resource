@@ -48,7 +48,7 @@ resources:
       url: ((jenkins.url))
       job: ((jenkins.job.name))
       username: ((jenkins.username))
-      api_token: ((jenkins.api_token))
+      login: ((jenkins.api_token))
       token: ((jenkins.job.token))
 
   - name: version

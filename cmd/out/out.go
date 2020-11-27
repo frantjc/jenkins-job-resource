@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	command := commands.NewCommand(
+	command := commands.NewJenkinsJobResource(
 		os.Stdin,
 		os.Stderr,
 		os.Stdout,
