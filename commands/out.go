@@ -19,7 +19,7 @@ func (j *JenkinsJobResource) Out() error {
 	    resp resource.OutResponse
 	)
 
-	err := j.readInput(req)
+	err := j.readInput(&req)
 	if err != nil {
 		return err
 	}

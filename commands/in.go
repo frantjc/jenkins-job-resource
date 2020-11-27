@@ -18,7 +18,7 @@ func (j *JenkinsJobResource) In() error {
 		resp resource.InResponse
 	)
 
-	err := j.readInput(req)
+	err := j.readInput(&req)
 	if err != nil {
 		return err
 	}
