@@ -31,7 +31,7 @@ var _ = Describe("Out", func () {
 	})
 
 	JustBeforeEach(func() {
-		cmd := exec.Command(bins.Check)
+		cmd := exec.Command(bins.Out)
 
 		payload, err := json.Marshal(req)
 		Expect(err).ToNot(HaveOccurred())

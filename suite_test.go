@@ -79,7 +79,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	req.Source = source
 
-	cmd := exec.Command(bins.Check)
+	cmd := exec.Command(bins.Out)
 
 	payload, err := json.Marshal(req)
 	Expect(err).ToNot(HaveOccurred())
