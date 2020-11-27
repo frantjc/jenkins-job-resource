@@ -13,22 +13,12 @@ type CheckRequest struct {
 // Version is the JSON object that is passed to and from Concourse
 type Version struct {
 	Number int    `json:"number,string"`
-	URL    string `json:"url"`
-}
-
-// ToBuild converts Version to Build to transfer information from Concourse to Jenkins
-func ToBuild(v *Version) gojenkins.Build {
-	return gojenkins.Build{
-		Number: v.Number,
-		Url: v.URL,
-	}
 }
 
 // ToVersion converts Build to Version to transfer infromation from Jenkins to Concourse
 func ToVersion(b *gojenkins.Build) Version {
 	return Version{
 		Number: b.Number,
-		URL: b.Url,
 	}
 }
 

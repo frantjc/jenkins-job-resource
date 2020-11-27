@@ -66,10 +66,6 @@ func (c *Command) In() error {
 				{ Name: "result", Value: build.Result },
 			}
 
-			if build.Result != "SUCCESS" {
-				return fmt.Errorf("%s %s resulted in %s", req.Source.Job, build.Id, build.Result)
-			}
-
 			for _, artifact := range build.Artifacts {
 				b, err := jenkins.GetArtifact(build, artifact)
 				if err != nil {
