@@ -41,9 +41,9 @@ func (j *JenkinsJobResource) In() error {
 	}
 
 	// TODO: fail on unsuccessful build?
-	build, err := jenkins.GetBuild(job, req.Version.Number)
+	build, err := jenkins.GetBuild(job, req.Version.Build)
 	if err != nil {
-		return fmt.Errorf("requested version of resource %d unavailable: %s", req.Version.Number, err)
+		return fmt.Errorf("requested version of resource %d unavailable: %s", req.Version.Build, err)
 	}
 
 	resp.Version = j.getVersion(&build)

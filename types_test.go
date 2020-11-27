@@ -16,11 +16,11 @@ var _ = Describe("Version", func () {
 
 		err := json.Unmarshal(raw, &version)
 		Expect(err).ToNot(HaveOccurred())
-		Expect(version.Number).To(Equal(11))
+		Expect(version.Build).To(Equal(11))
 	})
 
 	It("Should unmarshal number int into string", func() {
-		version := resource.Version{Number: 11}
+		version := resource.Version{Build: 11}
 
 		json, err := json.Marshal(version)
 		Expect(err).ToNot(HaveOccurred())

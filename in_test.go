@@ -67,7 +67,7 @@ var _ = Describe("In", func () {
 			req.Source = source
 
 			req.Version = resource.Version{
-				Number: 0,
+				Build: 0,
 			}
 		})
 
@@ -81,12 +81,12 @@ var _ = Describe("In", func () {
 			req.Source = source
 
 			req.Version = resource.Version{
-				Number: 1,
+				Build: 1,
 			}
 		})
 
 		It("captures metadata", func() {
-			if cmdErr != nil {
+			if cmdErr == nil {
 				Expect(cmdErr).NotTo(HaveOccurred())
 				Expect(len(resp.Metadata)).To(BeNumerically(">", 0))
 			} else {
@@ -95,16 +95,16 @@ var _ = Describe("In", func () {
 		})
 
 		It("gets the requested version", func() {
-			if cmdErr != nil {
+			if cmdErr == nil {
 				Expect(cmdErr).NotTo(HaveOccurred())
-				Expect(resp.Version.Number).To(Equal(req.Version.Number))
+				Expect(resp.Version.Build).To(Equal(req.Version.Build))
 			} else {
 				Skip("the specified $JENKINS_JOB must use a jenkinsfile like jenkins-job-resource/cicd/pipelines/jenkinsfile")
 			}
 		})
 
 		It("gets the version's artifacts", func() {
-			if cmdErr != nil {
+			if cmdErr == nil {
 				Expect(cmdErr).NotTo(HaveOccurred())
 				_, err := os.Stat(filepath.Join(src, "output.txt"))
 				Expect(err).NotTo(HaveOccurred())

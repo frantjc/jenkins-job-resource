@@ -57,7 +57,7 @@ var _ = Describe("Out", func () {
 		})
 
 		It("captures metadata", func() {
-			if cmdErr != nil {
+			if cmdErr == nil {
 				Expect(cmdErr).NotTo(HaveOccurred())
 				Expect(len(resp.Metadata)).To(BeNumerically(">", 0))
 			} else {
@@ -66,9 +66,9 @@ var _ = Describe("Out", func () {
 		})
 
 		It("gets a version", func() {
-			if cmdErr != nil {
+			if cmdErr == nil {
 				Expect(cmdErr).NotTo(HaveOccurred())
-				Expect(resp.Version.Number).To(BeNumerically(">", 0))
+				Expect(resp.Version.Build).To(BeNumerically(">", 0))
 			} else {
 				Skip("the specified $JENKINS_JOB must use a jenkinsfile like jenkins-job-resource/cicd/pipelines/jenkinsfile")
 			}

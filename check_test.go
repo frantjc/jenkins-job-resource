@@ -58,7 +58,7 @@ var _ = Describe("Check", func () {
 		It("returns the current build number", func() {
 			Expect(cmdErr).NotTo(HaveOccurred())
 			Expect(len(resp)).To(Equal(1))
-			Expect(resp[0].Number).To(BeNumerically(">", 0))
+			Expect(resp[0].Build).To(BeNumerically(">", 0))
 		})
 	})
 
@@ -67,15 +67,15 @@ var _ = Describe("Check", func () {
 			req.Source = source
 
 			req.Version = &resource.Version{
-				Number: 1,
+				Build: 1,
 			}
 		})
 
 		It("returns all builds since the given version", func() {
-			if cmdErr != nil {
+			if cmdErr == nil {
 				Expect(len(resp)).To(BeNumerically(">", 0))
-				for _, build := range resp {
-					Expect(build.Number).To(BeNumerically(">=", req.Version.Number))
+				for _, version := range resp {
+					Expect(version.Build).To(BeNumerically(">=", req.Version.Build))
 				}
 			} else {
 				Skip("the specified $JENKINS_JOB must use a jenkinsfile like jenkins-job-resource/cicd/pipelines/jenkinsfile")

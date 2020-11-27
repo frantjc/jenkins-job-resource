@@ -32,7 +32,7 @@ func (j *JenkinsJobResource) Check() error {
 		if req.Version != nil {
 			for _, build := range builds {
 				version := j.getVersion(&build)
-				if version.Number >= req.Version.Number {
+				if version.Build >= req.Version.Build {
 					// prepend
 					resp = append([]resource.Version{version}, resp...)
 				}

@@ -88,6 +88,6 @@ func (j *JenkinsJobResource) newJenkins(s resource.Source) *gojenkins.Jenkins {
 
 func (j *JenkinsJobResource) getVersion(b *gojenkins.Build) resource.Version {
 	return resource.Version{
-		Number: b.Number,
+		Build: b.Number,
 	}
 }

@@ -8,8 +8,7 @@ type CheckRequest struct {
 
 // Version is the JSON object that is passed to and from Concourse
 type Version struct {
-	// TODO: change to build?
-	Number int    `json:"number,string"`
+	Build int    `json:"build,string"`
 }
 
 // CheckResponse is the JSON object that we pass back to Concourse through stdout from /opt/resource/check
