@@ -46,6 +46,13 @@ func (j *JenkinsJobResource) In() error {
 	resp.Version = j.getVersion(&build)
 	resp.Metadata = j.getMetadata(&build)
 
+	for _, artifact := range build.Artifacts {
+		data, err := jenkins.GetArtifact(build, artifact)
+		if err == nil {
+			ioutil.WriteFile(filepath.Join(src, artifact.FileName), data, 0644)
+		}
+	}
+
 	j.writeOutput(resp)
 	if err != nil {
 		return fmt.Errorf("could not marshal JSON: %s", err)
