@@ -14,8 +14,10 @@ const defaultDescription = "Build triggered by Concourse"
 // Out runs the in script which checks stdin for a JSON object of the form of an OutRequest
 // triggers a new build and then fetches and writes it as well as Metadata about it to stdout
 func (j *JenkinsJobResource) Out() error {
-	var req resource.OutRequest
-	var resp resource.OutResponse
+	var (
+		req resource.OutRequest
+	    resp resource.OutResponse
+	)
 
 	err := j.readInput(req)
 	if err != nil {

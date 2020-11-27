@@ -13,8 +13,10 @@ import (
 // fetches and writes the requested Version as well as Metadata about it to stdout and
 // writes each of its output Artifacts to src/Artifact.FileName
 func (j *JenkinsJobResource) In() error {
-	var req resource.InRequest
-	var resp resource.InResponse
+	var (
+		req resource.InRequest
+		resp resource.InResponse
+	)
 
 	err := j.readInput(req)
 	if err != nil {

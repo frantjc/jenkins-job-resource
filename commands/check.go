@@ -9,8 +9,10 @@ import (
 // Check runs the in script which checks stdin for a JSON object of the form of a CheckRequest
 // fetches and writes the all Versions that are newer than the provided Version to stdout
 func (j *JenkinsJobResource) Check() error {
-	var req resource.CheckRequest
-	var resp resource.CheckResponse
+	var (
+		req resource.CheckRequest
+	    resp resource.CheckResponse
+	)
 
 	err := j.readInput(req)
 	if err != nil {
