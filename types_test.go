@@ -12,7 +12,7 @@ import (
 var _ = Describe("Version", func () {
 	It("Should marshal number string into int", func() {
 		var version resource.Version
-		raw := []byte(`{ "number": "11" }`)
+		raw := []byte(`{ "build": "11" }`)
 
 		err := json.Unmarshal(raw, &version)
 		Expect(err).ToNot(HaveOccurred())
@@ -24,7 +24,7 @@ var _ = Describe("Version", func () {
 
 		json, err := json.Marshal(version)
 		Expect(err).ToNot(HaveOccurred())
-		Expect(json).To(MatchJSON(`{"number":"11"}`))
+		Expect(json).To(MatchJSON(`{"build":"11"}`))
 	})
 })
 
