@@ -94,8 +94,8 @@ anchors:
       put: notify
       params:
         channel: ((discord.channel))
-        title: pipeline failed
-        message: jenkins-job-resource
+        title: jenkins-job-resource
+        message: job failed
 
   - &build_args
     JENKINS_URL: ((jenkins.url))
@@ -157,9 +157,16 @@ jobs:
   - name: build-jenkins-job-resource-image-ubuntu
     <<: *default_job_config
     on_success:
-      put: version
-      params:
-        bump: patch
+      in_parallel:
+        - put: version
+          params:
+            bump: patch
+        
+        - put: notify
+          params:
+            channel: ((discord.channel))
+            title: jenkins-job-resource
+            message: new version successful
     plan:
       - in_parallel:
         - get: jenkins-job-resource
