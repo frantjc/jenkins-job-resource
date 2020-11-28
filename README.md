@@ -55,16 +55,29 @@ Produces new versions for all builds (after the last version) ordered by the bui
 
 ### `in`
 
-TODO: `skip_download`, make some metadata available via some file(s), more?
+| Parameter        | Required | Example              | Description                                                                                                               |
+| ---------------- | -------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `accept_results` | no       | `["SUCCESS"]`        | array of acceptable results of the build. The step will fail if none match. Empty arrays are ignored                      |
+| `regexp`         | no       | `[path/to/output.*]` | limits downloaded artifacts to only those that match one of the given patterns. Hidden files (ex: `.git`) will be ignored |
+| `skip_download`  | no       |                      | whether or not to download any of the artifacts at all. Overrides `regexp`. Default `false`                               |
 
-Gets the artifacts outputted by the most recent build
+Optionally gets the specified artifacts outputted by the most recent build.
+
+Metadata is made available at `./.metadata/name`. ex:
+
+```
+$ cat ./my-jenkins-job/.metadata/result
+SUCCESS
+```
 
 ### `out`
 
-| Parameter      | Required | Example    | Description                                                           |
-| -------------- | -------- | ---------- | --------------------------------------------------------------------- |
-| `cause`        | no       |            | the cause of the build being triggered                                |
-| `description`  | no       |            | the description of the build being triggered                          |
-| `build_params` | no       | any object | name-value pairs that will be passed to the build as build parameters |
+| Parameter           | Required | Example               | Description                                                                                    |
+| ------------------- | -------- | --------------------- | ---------------------------------------------------------------------------------------------- |
+| `cause`             | no       |                       | the cause of the build being triggered. Default `caused by $ATC_EXTERNAL_URL/builds/$BUILD_ID` |
+| `cause_file`        | no       | `path/to/cause`       | path to a file containing the cause of the build being triggered                               |
+| `description`       | no       |                       | the description of the build. Default `build triggered by $ATC_EXTERNAL_URL/builds/$BUILD_ID`  |
+| `description_file`  | no       | `path/to/description` | path to a file containing the description of the build                                         |
+| `build_params`      | no       | any object            | name-value pairs that will be passed to the build as build parameters                          |
 
 Triggers a new build of the target job.

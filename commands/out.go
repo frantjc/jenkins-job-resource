@@ -10,18 +10,18 @@ import (
 
 // Out runs the in script which checks stdin for a JSON object of the form of an OutRequest
 // triggers a new build and then fetches and writes it as well as Metadata about it to stdout
-func (j *JenkinsJobResource) Out() error {
+func (r *JenkinsJobResource) Out() error {
 	var (
-		req resource.OutRequest
-	    resp resource.OutResponse
+		req  resource.OutRequest
+		resp resource.OutResponse
 	)
 
-	err := j.readInput(&req)
+	err := r.readInput(&req)
 	if err != nil {
 		return err
 	}
 
-	jenkins := j.newJenkins(req.Source)
+	jenkins := r.newJenkins(req.Source)
 
 	job, err := jenkins.GetJob(req.Source.Job)
 	if err != nil {
@@ -33,7 +33,11 @@ func (j *JenkinsJobResource) Out() error {
 		return fmt.Errorf("unable to turn build_params into a query string: %s", err)
 	}
 
-	params.Set("cause", req.Cause())
+	cause, err := r.getCause(&req.Params)
+	if err != nil {
+		return fmt.Errorf("unable to get cause: %s", err)
+	}
+	params.Set("cause", cause)
 
 	if req.Source.Token != "" {
 		params.Set("token", req.Source.Token)
@@ -47,20 +51,26 @@ func (j *JenkinsJobResource) Out() error {
 	}
 
 	for {
-		// TODO: fail on unsuccessful build?
-		if build, err := jenkins.GetBuild(job, job.LastCompletedBuild.Number + 1); err == nil {
+		if build, err := jenkins.GetBuild(job, job.LastCompletedBuild.Number+1); err == nil {
 			// TODO: do I care if there is an error here?
-			jenkins.SetBuildDescription(build, req.Description())
+			description, _ := r.getDescription(&req.Params)
+			jenkins.SetBuildDescription(build, description)
 
-			resp.Version = j.getVersion(&build)
-			resp.Metadata = j.getMetadata(&build)
+			resp.Version = r.getVersion(&build)
+			resp.Metadata = r.getMetadata(&build)
+
+			err = r.acceptResult(&build, req.Params.AcceptResults)
+			if err != nil {
+				return fmt.Errorf("unaccepted result: %s", err)
+			}
+
 			break
 		} else {
 			time.Sleep(5 * time.Second)
 		}
 	}
 
-	j.writeOutput(resp)
+	r.writeOutput(resp)
 	if err != nil {
 		return fmt.Errorf("could not marshal JSON: %s", err)
 	}

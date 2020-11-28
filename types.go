@@ -33,26 +33,6 @@ type OutRequest struct {
 	Params PutParams `json:"params"`
 }
 
-const defaultCause = "Triggered by Concourse"
-// Cause returns the given cause or the default cause
-func (req *OutRequest) Cause() string {
-	if req.Params.Cause != "" {
-		return req.Params.Cause
-	}
-
-	return defaultCause
-}
-
-const defaultDescription = "Build triggered by Concourse"
-// Description returns the given description or the default description
-func (req *OutRequest) Description() string {
-	if req.Params.Description != "" {
-		return req.Params.Description
-	}
-
-	return defaultDescription
-}
-
 // OutResponse is the JSON object that we pass back to Concourse through stdout from /opt/resource/out
 type OutResponse struct {
 	Version  Version    `json:"version"`
@@ -69,13 +49,20 @@ type Source struct {
 }
 
 // GetParams are additional parameters that can be passed to this Concourse Resource Type during a get step
-type GetParams struct{}
+type GetParams struct{
+	Regexp        []string `json:"regexp"`
+	SkipDownload  bool     `json:"skip_download"`
+	AcceptResults []string `json:"accept_results"`
+}
 
 // PutParams are additional parameters that can be passed to this Concourse Resource Type during a put step
 type PutParams struct{
-	Cause       string      `json:"cause,omitempty"`
-	BuildParams interface{} `json:"build_params,omitempty"`
-	Description string      `json:"description,omitempty"`
+	Cause           string      `json:"cause,omitempty"`
+	CauseFile       string      `json:"cause_file,omitempty"`
+	BuildParams     interface{} `json:"build_params,omitempty"`
+	Description     string      `json:"description,omitempty"`
+	DescriptionFile string      `json:"description_file,omitempty"`
+	AcceptResults   []string    `json:"accept_results"`
 }
 
 // Metadata is the object which is passed in array form to Concourse through stdout from /opt/resource/out and /opt/resource/in
