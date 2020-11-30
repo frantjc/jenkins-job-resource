@@ -152,8 +152,7 @@ jobs:
           tag_file: version/version
           tag_prefix: alpine-
           additional_tags: jenkins-job-resource/dockerfiles/alpine/additional_tags
-          build_args:
-            <<: *build_args
+          build_args: *build_args
         get_params:
           skip_download: true
 
@@ -186,8 +185,7 @@ jobs:
           tag_file: version/version
           tag_prefix: ubuntu-
           additional_tags: jenkins-job-resource/dockerfiles/ubuntu/additional_tags
-          build_args:
-            <<: *build_args
+          build_args: *build_args
         get_params:
           skip_download: true
 
