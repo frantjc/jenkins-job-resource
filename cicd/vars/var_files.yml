@@ -1,1 +1,1 @@
-var_files: [vars/vars-0.0.1.yml, jenkins-job-resource/cicd/vars/var_files.yml]
+var_files: [vars/vars-0.0.2.yml, jenkins-job-resource/cicd/vars/var_files.yml]
