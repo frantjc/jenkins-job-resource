@@ -25,16 +25,16 @@ type JenkinsJobResource struct {
 
 // NewJenkinsJobResource creates a new JenkinsJobResource struct
 func NewJenkinsJobResource(
-	stdin io.Reader,
+	stdin  io.Reader,
 	stderr io.Writer,
 	stdout io.Writer,
-	args []string,
+	args   []string,
 ) *JenkinsJobResource {
 	return &JenkinsJobResource{
-		stdin:  stdin,
-		stderr: stderr,
-		stdout: stdout,
-		args:   args,
+		stdin,
+		stderr,
+		stdout,
+		args,
 	}
 }
 
