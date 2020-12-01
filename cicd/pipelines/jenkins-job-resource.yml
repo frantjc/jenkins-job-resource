@@ -1,8 +1,9 @@
 resource_types:
-  - name: discord-resource
+  - name: discord-notification-resource
     type: registry-image
     source:
-      repository: trivigy/discord-resource
+      repository: logsquaredn/discord-notification-resource
+      tag: alpine
 
   - name: jenkins-job-resource
     type: registry-image
@@ -16,7 +17,7 @@ resources:
   - name: jenkins-job-resource
     type: git
     icon: github
-    check_every: 30m
+    check_every: 5m
     source:
       uri: https://github.com/logsquaredn/jenkins-job-resource/
       branch: master
@@ -24,7 +25,7 @@ resources:
   - name: jenkins-job-resource-image-alpine
     type: docker-image
     icon: docker
-    check_every: 1h
+    check_every: 9999h
     source: 
       username: ((docker.username))
       password: ((docker.password))
@@ -34,7 +35,7 @@ resources:
   - name: jenkins-job-resource-image-ubuntu
     type: docker-image
     icon: docker
-    check_every: 1h
+    check_every: 9999h
     source:
       username: ((docker.username))
       password: ((docker.password))
@@ -43,7 +44,7 @@ resources:
   - name: jenkins-job-resource-test
     type: jenkins-job-resource
     icon: test-tube
-    check_every: 1h
+    check_every: 5m
     source:
       url: ((jenkins.url))
       job: ((jenkins.job.name))
@@ -67,7 +68,7 @@ resources:
   - name: vars
     type: s3
     icon: cog
-    check_every: 30m
+    check_every: 10m
     source:
       bucket: ((aws.s3.bucket))
       regexp: ((aws.s3.keys.vars))
@@ -76,11 +77,12 @@ resources:
       region_name: ((aws.s3.region))
 
   - name: notify
-    type: discord-resource
+    type: discord-notification-resource
     icon: discord
     check_every: 9999h
     source:
-      token: ((discord.token))
+      webhook_id: ((discord.webhook.id))
+      token: ((discord.webhook.token))
 
 
 
@@ -93,9 +95,9 @@ anchors:
     on_failure:
       put: notify
       params:
-        channel: ((discord.channel))
-        title: jenkins-job-resource
-        message: job failed
+        content: jenkins-job-resource; job failed
+      get_params:
+        wait: true
 
   - &build_args
     JENKINS_URL: ((jenkins.url))
@@ -165,9 +167,7 @@ jobs:
         
         - put: notify
           params:
-            channel: ((discord.channel))
-            title: jenkins-job-resource
-            message: new version successful
+            content: jenkins-job-resource; new version successful
     plan:
       - in_parallel:
         - get: jenkins-job-resource
