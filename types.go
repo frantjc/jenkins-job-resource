@@ -41,18 +41,18 @@ type OutResponse struct {
 
 // Source is the JSON (yaml) object configured under the resources array in a Concourse pipeline
 type Source struct {
-	URL string `json:"url"`
-	Job string `json:"job"`
+	URL      string `json:"url"`
+	Job      string `json:"job"`
 	Username string `json:"username,omitempty"`
-	Login string `json:"login,omitempty"`
-	Token string `json:"token"`
+	Login    string `json:"login,omitempty"`
+	Token    string `json:"token"`
 }
 
 // GetParams are additional parameters that can be passed to this Concourse Resource Type during a get step
 type GetParams struct{
-	Regexp        []string `json:"regexp"`
-	SkipDownload  bool     `json:"skip_download"`
-	AcceptResults []string `json:"accept_results"`
+	Regexp        []string `json:"regexp,omitempty"`
+	SkipDownload  bool     `json:"skip_download,omitempty"`
+	AcceptResults []string `json:"accept_results,omitempty"`
 }
 
 // PutParams are additional parameters that can be passed to this Concourse Resource Type during a put step
@@ -62,7 +62,7 @@ type PutParams struct{
 	BuildParams     interface{} `json:"build_params,omitempty"`
 	Description     string      `json:"description,omitempty"`
 	DescriptionFile string      `json:"description_file,omitempty"`
-	AcceptResults   []string    `json:"accept_results"`
+	AcceptResults   []string    `json:"accept_results,omitempty"`
 }
 
 // Metadata is the object which is passed in array form to Concourse through stdout from /opt/resource/out and /opt/resource/in
