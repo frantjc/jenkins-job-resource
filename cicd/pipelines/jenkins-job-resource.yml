@@ -88,10 +88,10 @@ anchors:
         wait: true
 
   - &build_args
-    JENKINS_URL: ((jenkins.url))
-    JENKINS_JOB: ((jenkins.job.name))
-    JENKINS_JOB_TOKEN: ((jenkins.job.token))
-    JENKINS_USERNAME: ((jenkins.username))
+    JENKINS_URL: http://3.138.239.215:8080/
+    JENKINS_JOB: jenkins-job-resource-test
+    JENKINS_JOB_TOKEN: ((jenkins_job_token))
+    JENKINS_USERNAME: ((jenkins_username))
     JENKINS_API_TOKEN: ((jenkins_api_token))
 
 
