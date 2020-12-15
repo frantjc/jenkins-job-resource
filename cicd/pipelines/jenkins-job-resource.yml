@@ -27,9 +27,9 @@ resources:
     icon: docker
     check_every: 9999h
     source: 
-      username: ((docker.username))
-      password: ((docker.password))
-      repository: ((docker.username))/jenkins-job-resource
+      username: logsquaredn
+      password: ((docker_password))
+      repository: logsquaredn/jenkins-job-resource
       tag: alpine
 
   - name: jenkins-job-resource-image-ubuntu
@@ -37,20 +37,20 @@ resources:
     icon: docker
     check_every: 9999h
     source:
-      username: ((docker.username))
-      password: ((docker.password))
-      repository: ((docker.username))/jenkins-job-resource
+      username: ((docker_username))
+      password: ((docker_password))
+      repository: logsquaredn/jenkins-job-resource
 
   - name: jenkins-job-resource-test
     type: jenkins-job-resource
     icon: test-tube
     check_every: 5m
     source:
-      url: ((jenkins.url))
-      job: ((jenkins.job.name))
-      username: ((jenkins.username))
-      login: ((jenkins.api_token))
-      token: ((jenkins.job.token))
+      url: http://3.138.239.215:8080/
+      job: jenkins-job-resource-test
+      username: ((jenkins_username))
+      login: ((jenkins_api_token))
+      token: ((jenkins_job_token))
 
   - name: version
     type: semver
@@ -59,30 +59,19 @@ resources:
     source:
       initial_version: 0.0.1
       driver: s3
-      bucket: ((aws.s3.bucket))
-      key: ((aws.s3.keys.version))
-      access_key_id: ((aws.s3.access_key.id))
-      secret_access_key: ((aws.s3.access_key.secret))
-      region_name: ((aws.s3.region))
-
-  - name: vars
-    type: s3
-    icon: cog
-    check_every: 10m
-    source:
-      bucket: ((aws.s3.bucket))
-      regexp: ((aws.s3.keys.vars))
-      access_key_id: ((aws.s3.access_key.id))
-      secret_access_key: ((aws.s3.access_key.secret))
-      region_name: ((aws.s3.region))
+      bucket: jenkins-job-resource
+      key: version
+      access_key_id: ((s3_access_key_id))
+      secret_access_key: ((s3_secret_access_key))
+      region_name: us-east-2
 
   - name: notify
     type: discord-notification-resource
     icon: discord
     check_every: 9999h
     source:
-      webhook_id: ((discord.webhook.id))
-      token: ((discord.webhook.token))
+      webhook_id: ((discord_webhook_id))
+      token: ((discord_webhook_token))
 
 
 
@@ -96,7 +85,6 @@ anchors:
       put: notify
       params:
         content: jenkins-job-resource; job failed
-      get_params:
         wait: true
 
   - &build_args
@@ -104,7 +92,7 @@ anchors:
     JENKINS_JOB: ((jenkins.job.name))
     JENKINS_JOB_TOKEN: ((jenkins.job.token))
     JENKINS_USERNAME: ((jenkins.username))
-    JENKINS_API_TOKEN: ((jenkins.api_token))
+    JENKINS_API_TOKEN: ((jenkins_api_token))
 
 
 
@@ -121,16 +109,11 @@ jobs:
   - name: update-pipeline
     <<: *default_job_config
     plan:
-      - in_parallel:
-        - get: jenkins-job-resource
-          trigger: true
-
-        - get: vars
-          trigger: true
+      - get: jenkins-job-resource
+        trigger: true
 
       - set_pipeline: self
         file: jenkins-job-resource/cicd/pipelines/jenkins-job-resource.yml
-        var_files: ((var_files))
 
 
   - name: build-jenkins-job-resource-image-alpine
