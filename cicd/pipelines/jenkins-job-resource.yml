@@ -17,7 +17,7 @@ resources:
   - name: jenkins-job-resource
     type: git
     icon: github
-    check_every: 5m
+    check_every: 2m
     source:
       uri: https://github.com/logsquaredn/jenkins-job-resource/
       branch: master
@@ -44,7 +44,7 @@ resources:
   - name: jenkins-job-resource-test
     type: jenkins-job-resource
     icon: test-tube
-    check_every: 5m
+    check_every: 2m
     source:
       url: http://3.138.239.215:8080/
       job: jenkins-job-resource-test
