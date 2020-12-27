@@ -46,8 +46,8 @@ resources:
     icon: test-tube
     check_every: 2m
     source:
-      url: http://3.138.239.215:8080/
-      job: jenkins-job-resource-test
+      url: ((jenkins.url))
+      job: ((jenkins.job.name))
       username: ((jenkins_username))
       login: ((jenkins_api_token))
       token: ((jenkins_job_token))
@@ -88,8 +88,8 @@ anchors:
         wait: true
 
   - &build_args
-    JENKINS_URL: http://3.138.239.215:8080/
-    JENKINS_JOB: jenkins-job-resource-test
+    JENKINS_URL: ((jenkins.url))
+    JENKINS_JOB: ((jenkins.job.name))
     JENKINS_JOB_TOKEN: ((jenkins_job_token))
     JENKINS_USERNAME: ((jenkins_username))
     JENKINS_API_TOKEN: ((jenkins_api_token))
@@ -114,6 +114,7 @@ jobs:
 
       - set_pipeline: self
         file: jenkins-job-resource/cicd/pipelines/jenkins-job-resource.yml
+        var_files: [jenkins-job-resource/cicd/jenkins.yml]
 
 
   - name: build-jenkins-job-resource-image-alpine
