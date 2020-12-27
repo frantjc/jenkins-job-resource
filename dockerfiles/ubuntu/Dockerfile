@@ -17,7 +17,10 @@ RUN set -e; for pkg in $(go list ./...); do \
 
 FROM ubuntu:bionic AS resource
 ENV DEBAIN_FRONTEND=noninteractive
-RUN apt-get update
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 COPY --from=builder assets/ opt/resource/
 RUN chmod +x /opt/resource/*
 

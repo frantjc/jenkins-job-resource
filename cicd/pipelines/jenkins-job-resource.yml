@@ -59,8 +59,8 @@ resources:
     source:
       initial_version: 0.0.1
       driver: s3
-      bucket: jenkins-job-resource
-      key: version
+      bucket: resource-types
+      key: jenkins-job-resource/version
       access_key_id: ((s3_access_key_id))
       secret_access_key: ((s3_secret_access_key))
       region_name: us-east-2
