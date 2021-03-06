@@ -27,7 +27,7 @@ resources:
     icon: docker
     check_every: 9999h
     source: 
-      username: logsquaredn
+      username: ((docker_username))
       password: ((docker_password))
       repository: logsquaredn/jenkins-job-resource
       tag: alpine

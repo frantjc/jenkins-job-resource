@@ -1,10 +1,8 @@
-FROM golang:latest AS builder
+FROM golang AS builder
 WORKDIR /src
-
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
-
 COPY . .
 ENV CGO_ENABLED 0
 RUN go build -o /assets/check ./cmd/check \
@@ -21,7 +19,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     ca-certificates \
   && rm -rf /var/lib/apt/lists/*
-COPY --from=builder assets/ opt/resource/
+COPY --from=builder assets/ /opt/resource/
 RUN chmod +x /opt/resource/*
 
 FROM resource AS tests
