@@ -8,7 +8,6 @@ ENV CGO_ENABLED 0
 RUN go build -o /assets/check ./cmd/check \
     && go build -o /assets/in ./cmd/in \
     && go build -o /assets/out ./cmd/out
-
 RUN set -e; for pkg in $(go list ./...); do \
 		go test -o "/tests/$(basename $pkg).test" -c $pkg; \
 	done
