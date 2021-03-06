@@ -20,7 +20,7 @@ resources:
     check_every: 2m
     source:
       uri: https://github.com/logsquaredn/jenkins-job-resource/
-      branch: master
+      branch: main
 
   - name: jenkins-job-resource-image-alpine
     type: docker-image
