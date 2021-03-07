@@ -25,10 +25,10 @@ type JenkinsJobResource struct {
 
 // NewJenkinsJobResource creates a new JenkinsJobResource struct
 func NewJenkinsJobResource(
-	stdin  io.Reader,
+	stdin io.Reader,
 	stderr io.Writer,
 	stdout io.Writer,
-	args   []string,
+	args []string,
 ) *JenkinsJobResource {
 	return &JenkinsJobResource{
 		stdin,
@@ -83,7 +83,7 @@ func (r *JenkinsJobResource) acceptResult(build *gojenkins.Build, acceptResults 
 	for _, acceptable := range acceptResults {
 		if result == acceptable {
 			accept = true
-			break;
+			break
 		}
 	}
 

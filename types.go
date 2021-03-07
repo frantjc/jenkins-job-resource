@@ -8,7 +8,7 @@ type CheckRequest struct {
 
 // Version is the JSON object that is passed to and from Concourse
 type Version struct {
-	Build int    `json:"build,string"`
+	Build int `json:"build,string"`
 }
 
 // CheckResponse is the JSON object that we pass back to Concourse through stdout from /opt/resource/check
@@ -49,14 +49,14 @@ type Source struct {
 }
 
 // GetParams are additional parameters that can be passed to this Concourse Resource Type during a get step
-type GetParams struct{
+type GetParams struct {
 	Regexp        []string `json:"regexp,omitempty"`
 	SkipDownload  bool     `json:"skip_download,omitempty"`
 	AcceptResults []string `json:"accept_results,omitempty"`
 }
 
 // PutParams are additional parameters that can be passed to this Concourse Resource Type during a put step
-type PutParams struct{
+type PutParams struct {
 	Cause           string      `json:"cause,omitempty"`
 	CauseFile       string      `json:"cause_file,omitempty"`
 	BuildParams     interface{} `json:"build_params,omitempty"`
