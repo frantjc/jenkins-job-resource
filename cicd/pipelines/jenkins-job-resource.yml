@@ -193,12 +193,10 @@ jobs:
     - get: jenkins-job-resource-image-alpine
       passed:
       - build-jenkins-job-resource-image-alpine
-      - build-jenkins-job-resource-image-ubuntu
       trigger: true
 
     - get: jenkins-job-resource-image-ubuntu
       passed:
-      - build-jenkins-job-resource-image-alpine
       - build-jenkins-job-resource-image-ubuntu
       trigger: true
 
