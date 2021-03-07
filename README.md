@@ -6,31 +6,31 @@ A Concourse resource for jobs on Jenkins.  Written in Go.
 
 ```yaml
 resource_types:
-  - name: jenkins-job-resource
-    type: registry-image
-    source:
-      repository: logsquaredn/jenkins-job-resource
-      tag: latest
+- name: jenkins-job-resource
+  type: registry-image
+  source:
+    repository: logsquaredn/jenkins-job-resource
+    tag: latest
 
 resources:
-  - name: my-jenkins-job
-    type: jenkins-job-resource
-    source:
-      ...
+- name: my-jenkins-job
+  type: jenkins-job-resource
+  source:
+    ...
 
 jobs:
-  - name: some-job
-    plan:
-      ...
-      - put: my-jenkins-job
-        params:
-          cause: some-job in Concourse caused this build
-          build_params:
-            foo: bar
+- name: some-job
+  plan:
+  ...
+  - put: my-jenkins-job
+    params:
+      cause: some-job in Concourse caused this build
+      build_params:
+        foo: bar
 
-  - name: another-job
-    plan:
-      - get: my-jenkins-job
+- name: another-job
+  plan:
+  - get: my-jenkins-job
 ```
 
 ## Source Configuration
