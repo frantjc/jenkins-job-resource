@@ -97,11 +97,23 @@ anchors:
 
 
 groups:
-  - name: ci
-    jobs: [update-pipeline, build-jenkins-job-resource-image-alpine, build-jenkins-job-resource-image-ubuntu]
+  - name: build-resource
+    jobs:
+      - build-jenkins-job-resource-image-alpine
+      - build-jenkins-job-resource-image-ubuntu
 
-  - name: test
-    jobs: [trigger-build, get-build]
+  - name: test-resource
+    jobs:
+      - trigger-build
+      - get-build
+
+  - name: all
+      jobs:
+      - update-pipeline
+      - build-jenkins-job-resource-image-alpine
+      - build-jenkins-job-resource-image-ubuntu
+      - trigger-build
+      - get-build
 
 
 
