@@ -1,217 +1,244 @@
 resource_types:
-  - name: discord-notification-resource
-    type: registry-image
-    source:
-      repository: logsquaredn/discord-notification-resource
-      tag: alpine
+- name: discord-notification-resource
+  type: registry-image
+  source:
+    repository: logsquaredn/discord-notification-resource
+    tag: alpine
 
-  - name: jenkins-job-resource
-    type: registry-image
-    source:
-      repository: logsquaredn/jenkins-job-resource
-      tag: latest
+- name: jenkins-job-resource
+  type: registry-image
+  source:
+    repository: logsquaredn/jenkins-job-resource
+    tag: latest
 
 
 
 resources:
-  - name: jenkins-job-resource
-    type: git
-    icon: github
-    check_every: 2m
-    source:
-      uri: https://github.com/logsquaredn/jenkins-job-resource/
-      branch: main
+- name: jenkins-job-resource
+  type: git
+  icon: github
+  check_every: 2m
+  source:
+    uri: https://github.com/logsquaredn/jenkins-job-resource/
+    branch: main
 
-  - name: jenkins-job-resource-image-alpine
-    type: docker-image
-    icon: docker
-    check_every: 9999h
-    source: 
-      username: ((docker_username))
-      password: ((docker_password))
-      repository: logsquaredn/jenkins-job-resource
-      tag: alpine
+- name: jenkins-job-resource-image-alpine
+  type: docker-image
+  icon: docker
+  check_every: 9999h
+  source: 
+    username: ((docker_username))
+    password: ((docker_password))
+    repository: logsquaredn/jenkins-job-resource
+    tag: alpine
 
-  - name: jenkins-job-resource-image-ubuntu
-    type: docker-image
-    icon: docker
-    check_every: 9999h
-    source:
-      username: ((docker_username))
-      password: ((docker_password))
-      repository: logsquaredn/jenkins-job-resource
+- name: jenkins-job-resource-image-ubuntu
+  type: docker-image
+  icon: docker
+  check_every: 9999h
+  source:
+    username: ((docker_username))
+    password: ((docker_password))
+    repository: logsquaredn/jenkins-job-resource
 
-  - name: jenkins-job-resource-test
-    type: jenkins-job-resource
-    icon: test-tube
-    check_every: 2m
-    source:
-      url: ((jenkins.url))
-      job: ((jenkins.job.name))
-      username: ((jenkins_username))
-      login: ((jenkins_api_token))
-      token: ((jenkins_job_token))
+- name: jenkins-job-resource-test
+  type: jenkins-job-resource
+  icon: test-tube
+  check_every: 2m
+  source:
+    url: ((jenkins.url))
+    job: ((jenkins.job.name))
+    username: ((jenkins_username))
+    login: ((jenkins_api_token))
+    token: ((jenkins_job_token))
 
-  - name: version
-    type: semver
-    icon: tag
-    check_every: 9999h
-    source:
-      initial_version: 0.0.1
-      driver: s3
-      bucket: resource-types
-      key: jenkins-job-resource/version
-      access_key_id: ((s3_access_key_id))
-      secret_access_key: ((s3_secret_access_key))
-      region_name: us-east-2
+- name: version
+  type: semver
+  icon: tag
+  check_every: 9999h
+  source:
+    initial_version: 0.0.1
+    driver: s3
+    bucket: resource-types
+    key: jenkins-job-resource/version
+    access_key_id: ((s3_access_key_id))
+    secret_access_key: ((s3_secret_access_key))
+    region_name: us-east-2
 
-  - name: notify
-    type: discord-notification-resource
-    icon: discord
-    check_every: 9999h
-    source:
-      webhook_id: ((discord_webhook_id))
-      token: ((discord_webhook_token))
+- name: notify
+  type: discord-notification-resource
+  icon: discord
+  check_every: 9999h
+  source:
+    webhook_id: ((discord_webhook_id))
+    token: ((discord_webhook_token))
 
 
 
 anchors:
-  - &default_job_config
-    build_log_retention:
-      builds: 12
-      minimum_succeeded_builds: 3
-    serial: true
-    on_failure:
-      put: notify
-      params:
-        content: jenkins-job-resource; job failed
-        wait: true
+- &default_job_config
+  build_log_retention:
+    builds: 12
+    minimum_succeeded_builds: 3
+  serial: true
+  on_failure:
+    put: notify
+    params:
+      content: jenkins-job-resource; job failed
+      wait: true
 
-  - &build_args
-    JENKINS_URL: ((jenkins.url))
-    JENKINS_JOB: ((jenkins.job.name))
-    JENKINS_JOB_TOKEN: ((jenkins_job_token))
-    JENKINS_USERNAME: ((jenkins_username))
-    JENKINS_API_TOKEN: ((jenkins_api_token))
+- &build_args
+  JENKINS_URL: ((jenkins.url))
+  JENKINS_JOB: ((jenkins.job.name))
+  JENKINS_JOB_TOKEN: ((jenkins_job_token))
+  JENKINS_USERNAME: ((jenkins_username))
+  JENKINS_API_TOKEN: ((jenkins_api_token))
 
 
 
 groups:
-  - name: build-resource
-    jobs:
-      - build-jenkins-job-resource-image-alpine
-      - build-jenkins-job-resource-image-ubuntu
+- name: build-resource
+  jobs:
+  - build-jenkins-job-resource-image-alpine
+  - build-jenkins-job-resource-image-ubuntu
 
-  - name: test-resource
-    jobs:
-      - trigger-build
-      - get-build
+- name: test-resource
+  jobs:
+  - trigger-build
+  - get-build
 
-  - name: all
-      jobs:
-      - update-pipeline
-      - build-jenkins-job-resource-image-alpine
-      - build-jenkins-job-resource-image-ubuntu
-      - trigger-build
-      - get-build
+- name: all
+  jobs:
+  - update-pipeline
+  - build-jenkins-job-resource-image-alpine
+  - build-jenkins-job-resource-image-ubuntu
+  - bump-version
+  - trigger-build
+  - get-build
 
 
 
 jobs:
-  - name: update-pipeline
-    <<: *default_job_config
-    plan:
-      - get: jenkins-job-resource
-        trigger: true
+- name: update-pipeline
+  <<: *default_job_config
+  plan:
+  - get: jenkins-job-resource
+    trigger: true
 
-      - set_pipeline: self
-        file: jenkins-job-resource/cicd/pipelines/jenkins-job-resource.yml
-        var_files: [jenkins-job-resource/cicd/jenkins.yml]
-
-
-  - name: build-jenkins-job-resource-image-alpine
-    <<: *default_job_config
-    plan:
-      - in_parallel:
-        - get: jenkins-job-resource
-          passed: [update-pipeline]
-          trigger: true
-
-        - get: version
-
-      - put: jenkins-job-resource-image-alpine
-        params:
-          build: jenkins-job-resource/
-          tag_as_latest: false
-          cache: true
-          dockerfile: jenkins-job-resource/dockerfiles/alpine/Dockerfile
-          tag_file: version/version
-          tag_prefix: alpine-
-          additional_tags: jenkins-job-resource/dockerfiles/alpine/additional_tags
-          build_args: *build_args
-        get_params:
-          skip_download: true
+  - set_pipeline: self
+    file: jenkins-job-resource/cicd/pipelines/jenkins-job-resource.yml
+    var_files:
+    - jenkins-job-resource/cicd/jenkins.yml
 
 
-  - name: build-jenkins-job-resource-image-ubuntu
-    <<: *default_job_config
-    on_success:
-      in_parallel:
-        - put: version
-          params:
-            bump: patch
-        
-        - put: notify
-          params:
-            content: jenkins-job-resource; new version successful
-    plan:
-      - in_parallel:
-        - get: jenkins-job-resource
-          passed: [update-pipeline]
-          trigger: true
+- name: build-jenkins-job-resource-image-alpine
+  <<: *default_job_config
+  plan:
+  - in_parallel:
+    - get: jenkins-job-resource
+      passed:
+      - update-pipeline
+      trigger: true
 
-        - get: version
+    - get: version
 
-      - put: jenkins-job-resource-image-ubuntu
-        params:
-          build: jenkins-job-resource/
-          tag_as_latest: true
-          cache: true
-          dockerfile: jenkins-job-resource/dockerfiles/ubuntu/Dockerfile
-          tag_file: version/version
-          tag_prefix: ubuntu-
-          additional_tags: jenkins-job-resource/dockerfiles/ubuntu/additional_tags
-          build_args: *build_args
-        get_params:
-          skip_download: true
+  - put: jenkins-job-resource-image-alpine
+    params:
+      build: jenkins-job-resource/
+      tag_as_latest: false
+      cache: true
+      dockerfile: jenkins-job-resource/dockerfiles/alpine/Dockerfile
+      tag_file: version/version
+      tag_prefix: alpine-
+      additional_tags: jenkins-job-resource/dockerfiles/alpine/additional_tags
+      build_args: *build_args
+    get_params:
+      skip_download: true
 
 
-  - name: trigger-build
-    <<: *default_job_config
-    plan:
-      - put: jenkins-job-resource-test
-        params:
-          cause: Concourse trigger
+- name: build-jenkins-job-resource-image-ubuntu
+  <<: *default_job_config
+  plan:
+  - in_parallel:
+    - get: jenkins-job-resource
+      passed:
+      - update-pipeline
+      trigger: true
+
+    - get: version
+
+  - put: jenkins-job-resource-image-ubuntu
+    params:
+      build: jenkins-job-resource/
+      tag_as_latest: true
+      cache: true
+      dockerfile: jenkins-job-resource/dockerfiles/ubuntu/Dockerfile
+      tag_file: version/version
+      tag_prefix: ubuntu-
+      additional_tags: jenkins-job-resource/dockerfiles/ubuntu/additional_tags
+      build_args: *build_args
+    get_params:
+      skip_download: true
+
+- name: bump-version
+  <<: *default_job_config
+  plan:
+  - in_parallel:
+    - get: version
+      passed:
+      - build-jenkins-job-resource-image-alpine
+      - build-jenkins-job-resource-image-ubuntu
+      trigger: true
+
+    - get: jenkins-job-resource-image-alpine
+      passed:
+      - build-jenkins-job-resource-image-alpine
+      - build-jenkins-job-resource-image-ubuntu
+      trigger: true
+
+    - get: jenkins-job-resource-image-ubuntu
+      passed:
+      - build-jenkins-job-resource-image-alpine
+      - build-jenkins-job-resource-image-ubuntu
+      trigger: true
+
+  - in_parallel:
+    - put: version
+      params:
+        bump: patch
+    
+    - put: notify
+      params:
+        content: jenkins-job-resource; new version successful
 
 
-  - name: get-build
-    <<: *default_job_config
-    plan:
-      - get: jenkins-job-resource-test
-        passed: [trigger-build]
-        trigger: true
+- name: trigger-build
+  <<: *default_job_config
+  plan:
+  - put: jenkins-job-resource-test
+    params:
+      cause: Concourse trigger
 
-      - task: check-input
-        config:
-          platform: linux
-          image_resource:
-            type: registry-image
-            source:
-              repository: alpine
-          inputs:
-            - name: jenkins-job-resource-test
-          run:
-            path: sh
-            args:
-              - -exc
-              - ls; ls -al jenkins-job-resource-test
+
+- name: get-build
+  <<: *default_job_config
+  plan:
+  - get: jenkins-job-resource-test
+    passed:
+    - trigger-build
+    trigger: true
+
+  - task: check-input
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: alpine
+      inputs:
+        - name: jenkins-job-resource-test
+      run:
+        path: sh
+        args:
+        - -exc
+        - ls; ls -al jenkins-job-resource-test
