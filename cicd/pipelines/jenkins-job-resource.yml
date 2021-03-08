@@ -146,7 +146,6 @@ jobs:
     params:
       build: jenkins-job-resource/
       tag_as_latest: false
-      cache: true
       dockerfile: jenkins-job-resource/dockerfiles/alpine/Dockerfile
       tag_file: version/version
       tag_prefix: alpine-
@@ -171,7 +170,6 @@ jobs:
     params:
       build: jenkins-job-resource/
       tag_as_latest: true
-      cache: true
       dockerfile: jenkins-job-resource/dockerfiles/ubuntu/Dockerfile
       tag_file: version/version
       tag_prefix: ubuntu-
