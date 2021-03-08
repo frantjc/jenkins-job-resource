@@ -125,7 +125,7 @@ func (r *JenkinsJobResource) writeMetadata(mds []resource.Metadata) error {
 
 	err = os.MkdirAll(filepath.Join(src, ".metadata"), 0755)
 	if err != nil {
-		return fmt.Errorf("unable to make directory %s", src)
+		return fmt.Errorf("unable to make directory %s", filepath.Join(src, ".metadata"))
 	}
 
 	for _, md := range mds {
