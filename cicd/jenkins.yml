@@ -1,4 +1,0 @@
-jenkins:
-  url: https://jenkins.logsquaredn.io
-  job:
-    name: jenkins-job-resource-test
