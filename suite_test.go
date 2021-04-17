@@ -20,6 +20,7 @@ var bins struct {
 	Check string `json:"check"`
 }
 
+var skipTests = os.Getenv("SKIP_TESTS")
 var jenkinsUrl = os.Getenv("JENKINS_URL")
 var jenkinsJob = os.Getenv("JENKINS_JOB")
 var authenticationToken = os.Getenv("JENKINS_JOB_TOKEN")
@@ -34,7 +35,9 @@ var source = resource.Source{
 }
 
 func checkEnvConfigured() {
-	if jenkinsUrl == "" || jenkinsJob == "" || authenticationToken == "" || jenkinsUsername == "" || apiToken == "" {
+	if skipTests != "" {
+		Skip("skipping: $SKIP_TESTS has value")
+	} else if jenkinsUrl == "" || jenkinsJob == "" || authenticationToken == "" || jenkinsUsername == "" || apiToken == "" {
 		Skip("must specify $JENKINS_URL, $JENKINS_JOB, $JENKINS_JOB_TOKEN, $JENKINS_USERNAME and $JENKINS_API_TOKEN")
 	}
 }
