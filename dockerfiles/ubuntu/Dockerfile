@@ -1,4 +1,4 @@
-ARG base_image=ubunut:bionic
+ARG base_image=ubuntu:bionic
 ARG build_image=golang
 
 FROM ${base_image} as base
