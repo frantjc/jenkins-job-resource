@@ -10,7 +10,7 @@ import (
 // fetches and writes the all Versions that are newer than the provided Version to stdout
 func (r *JenkinsJobResource) Check() error {
 	var (
-		req resource.CheckRequest
+	    req resource.CheckRequest
 	    resp resource.CheckResponse
 	)
 
