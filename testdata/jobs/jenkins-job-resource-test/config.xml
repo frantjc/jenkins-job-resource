@@ -1,0 +1,41 @@
+<project>
+    <description/>
+    <keepDependencies>false</keepDependencies>
+    <properties>
+        <hudson.model.ParametersDefinitionProperty>
+        <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+        <name>parameter</name>
+        <defaultValue>default</defaultValue>
+        <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        </parameterDefinitions>
+        </hudson.model.ParametersDefinitionProperty>
+    </properties>
+    <scm class="hudson.scm.NullSCM"/>
+    <canRoam>true</canRoam>
+    <disabled>false</disabled>
+    <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+    <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+    <authToken>job_token</authToken>
+    <triggers/>
+    <concurrentBuild>false</concurrentBuild>
+    <builders>
+        <hudson.tasks.Shell>
+            <command>echo $parameter > output.txt</command>
+            <configuredLocalRules/>
+        </hudson.tasks.Shell>
+    </builders>
+    <publishers>
+        <hudson.tasks.ArtifactArchiver>
+            <artifacts>output.txt</artifacts>
+            <allowEmptyArchive>false</allowEmptyArchive>
+            <onlyIfSuccessful>false</onlyIfSuccessful>
+            <fingerprint>false</fingerprint>
+            <defaultExcludes>true</defaultExcludes>
+            <caseSensitive>true</caseSensitive>
+            <followSymlinks>false</followSymlinks>
+        </hudson.tasks.ArtifactArchiver>
+    </publishers>
+    <buildWrappers/>
+</project>

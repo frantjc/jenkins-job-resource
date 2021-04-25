@@ -1,2 +1,6 @@
 # macOS
 .DS_Store
+
+# jenkins
+testdata/jobs/*/*
+!testdata/jobs/*/config.xml

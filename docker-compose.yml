@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  jenkins:
+    image: jenkins/jenkins
+    volumes:
+    - ./testdata/jobs:/var/jenkins_home/jobs
+    ports:
+    - 8080:8080
+    environment:
+      JAVA_OPTS: -Djenkins.install.runSetupWizard=false -Djenkins.install.SetupWizard.adminInitialApiToken=api_token -Dhudson.security.csrf.DefaultCrumbIssuer.EXCLUDE_SESSION_ID=true
+      JENKINS_HOME: /var/jenkins_home
+  # not functional; this service needs to build after the jenkins service has started
+  jenkins-job-resource:
+    build:
+      context: .
+      dockerfile: dockerfiles/ubuntu/Dockerfile
+      target: tests
+      args:
+        JENKINS_URL: http://jenkins
+        JENKINS_JOB: jenkins-job-resource-test
+        JENKINS_JOB_TOKEN: job_token
+        JENKINS_USERNAME: admin
+        JENKINS_API_TOKEN: api_token
+    depends_on:
+      jenkins:
+        condition: service_completed_successfully

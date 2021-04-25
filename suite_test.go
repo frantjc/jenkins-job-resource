@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 
 	resource "github.com/logsquaredn/jenkins-job-resource"
@@ -20,23 +21,25 @@ var bins struct {
 	Check string `json:"check"`
 }
 
-var skipTests = os.Getenv("SKIP_TESTS")
-var jenkinsUrl = os.Getenv("JENKINS_URL")
-var jenkinsJob = os.Getenv("JENKINS_JOB")
-var authenticationToken = os.Getenv("JENKINS_JOB_TOKEN")
-var jenkinsUsername = os.Getenv("JENKINS_USERNAME")
-var apiToken = os.Getenv("JENKINS_API_TOKEN")
-var source = resource.Source{
-	URL: jenkinsUrl,
-	Job: jenkinsJob,
-	Token: authenticationToken,
-	Username: jenkinsUsername,
-	Login: apiToken,
-}
+var (
+	skipTests = os.Getenv("SKIP_TESTS")
+    jenkinsUrl = os.Getenv("JENKINS_URL")
+    jenkinsJob = os.Getenv("JENKINS_JOB")
+    authenticationToken = os.Getenv("JENKINS_JOB_TOKEN")
+    jenkinsUsername = os.Getenv("JENKINS_USERNAME")
+    apiToken = os.Getenv("JENKINS_API_TOKEN")
+    source = resource.Source{
+    	URL: jenkinsUrl,
+    	Job: jenkinsJob,
+    	Token: authenticationToken,
+    	Username: jenkinsUsername,
+    	Login: apiToken,
+    }
+)
 
 func checkEnvConfigured() {
-	if skipTests != "" {
-		Skip("skipping: $SKIP_TESTS has value")
+	if strings.EqualFold(skipTests, "true") || strings.EqualFold(skipTests, "1") {
+		Skip("skipping: $SKIP_TESTS is true")
 	} else if jenkinsUrl == "" || jenkinsJob == "" || authenticationToken == "" || jenkinsUsername == "" || apiToken == "" {
 		Skip("must specify $JENKINS_URL, $JENKINS_JOB, $JENKINS_JOB_TOKEN, $JENKINS_USERNAME and $JENKINS_API_TOKEN")
 	}
