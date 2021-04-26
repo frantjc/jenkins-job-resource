@@ -30,14 +30,16 @@ RUN chmod +x /opt/resource/*
 FROM resource AS tests
 COPY --from=builder /tests/ /tests/
 COPY testdata/ testdata/
+COPY bin/wait_for_jenkins /usr/bin/
+COPY bin/test_entrypoint /usr/bin/entrypoint
+RUN apk update && \
+	apk add --no-cache curl
 
-ARG SKIP_TESTS
-ARG JENKINS_URL
-ARG JENKINS_JOB
-ARG JENKINS_JOB_TOKEN
-ARG JENKINS_USERNAME
-ARG JENKINS_API_TOKEN
+ENV SKIP_TESTS        ""
+ENV JENKINS_URL       ""
+ENV JENKINS_JOB       ""
+ENV JENKINS_JOB_TOKEN ""
+ENV JENKINS_USERNAME  ""
+ENV JENKINS_API_TOKEN ""
 
-RUN set -e; for test in /tests/*.test; do \
-		$test -ginkgo.v; \
-	done
+CMD ["entrypoint"]

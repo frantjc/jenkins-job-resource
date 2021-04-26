@@ -1,19 +1,35 @@
-#!/bin/bash
+#!/bin/sh
+JENKINS_JOB_RESOURCE=$(cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && cd .. && pwd)
+PATH=$PATH:$JENKINS_JOB_RESOURCE/bin
+DEPENDENCIES="docker wait_for_jenkins uuidgen"
+
+echo "checking for dependencies..."
+which -a $DEPENDENCIES
+if [ $? -ne 0 ]; then
+    echo "one of dependencies not found: $DEPENDENCIES"
+    exit 1;
+fi
+echo ""
+
+export JENKINS_URL=http://localhost:8080
+JENKINS_HOME=/var/jenkins_home
+TEST_CONTAINER=$(uuidgen | tr A-Z a-z)
+
 set -e
 
-SOURCE=$(cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && cd .. && pwd)
-PATH=$SOURCE/bin:$PATH
-JENKINS_URL=http://localhost:8080
-JENKINS_HOME=/var/jenkins_home
-TEST_CONTAINER=$(docker run -d --rm \
-    -v $SOURCE/testdata/jobs:$JENKINS_HOME/jobs \
+echo "running jenkins/jenkins..."
+docker run -d --rm \
+    -v $JENKINS_JOB_RESOURCE/testdata/jobs:$JENKINS_HOME/jobs \
     -p 8080:8080 \
     -e JAVA_OPTS='-Djenkins.install.runSetupWizard=false -Djenkins.install.SetupWizard.adminInitialApiToken=api_token -Dhudson.security.csrf.DefaultCrumbIssuer.EXCLUDE_SESSION_ID=true' \
     -e JENKINS_HOME=$JENKINS_HOME \
-    jenkins/jenkins)
+    --name $TEST_CONTAINER \
+    jenkins/jenkins
+echo ""
 
-wait_for_jenkins $JENKINS_URL
+wait_for_jenkins
 
+echo "building jenkins-job-resource-ubuntu..."
 docker build \
     --target tests \
     --build-arg JENKINS_URL=$JENKINS_URL \
@@ -22,6 +38,25 @@ docker build \
     --build-arg JENKINS_USERNAME=admin \
     --build-arg JENKINS_API_TOKEN=api_token \
     -f dockerfiles/ubuntu/Dockerfile  \
-    --network host .
+    --network host \
+    .
+echo ""
 
+echo "building jenkins-job-resource-alpine..."
+docker build \
+    --target tests \
+    --build-arg JENKINS_URL=$JENKINS_URL \
+    --build-arg JENKINS_JOB=jenkins-job-resource-test \
+    --build-arg JENKINS_JOB_TOKEN=job_token \
+    --build-arg JENKINS_USERNAME=admin \
+    --build-arg JENKINS_API_TOKEN=api_token \
+    -f dockerfiles/alpine/Dockerfile  \
+    --network host \
+    .
+echo ""
+
+echo "stopping jenkins/jenkins..."
 docker stop $TEST_CONTAINER
+echo ""
+
+exit 0

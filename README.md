@@ -83,3 +83,59 @@ SUCCESS
 | `build_params`      | no       | any object            | name-value pairs that will be passed to the build as build parameters                          |
 
 Triggers a new build of the target job and gets the result
+
+## Development
+
+### Prerequisites
+
+* golang is *required* - version 1.11.x or above is required for go mod to work
+* docker is *required* - version 20.10.x is tested; earlier versions may also work.
+* go mod is used for dependency management of the golang packages.
+
+### Tests
+
+The tests have been embedded with the `Dockerfile`; ensuring that the testing environment is consistent across any `docker` enabled platform. When the docker image builds, the test are run inside the docker container, on failure they will stop the build.
+
+The tests can be ran for both the `ubuntu` and `alpine` images a number of ways:
+
+* Against your own Jenkins job in some Jenkins deployment:
+
+```sh
+docker build \
+  -t jenkins-job-resource \
+  --target tests \
+  -f dockerfiles/alpine/Dockerfile \
+  --build-arg JENKINS_URL=http://example.jenkins.com \
+  --build-arg JENKINS_JOB=my-jenkins-job \
+  --build-arg JENKINS_JOB_TOKEN=my-jenkins-job-token \
+  --build-arg JENKINS_USERNAME=my-username \
+  --build-arg JENKINS_API_TOKEN=my-api-token \
+  .
+
+docker build \
+  -t jenkins-job-resource \
+  --target tests \
+  -f dockerfiles/ubuntu/Dockerfile \
+  --build-arg JENKINS_URL=http://example.jenkins.com \
+  --build-arg JENKINS_JOB=my-jenkins-job \
+  --build-arg JENKINS_JOB_TOKEN=my_jenkins_job_token \
+  --build-arg JENKINS_USERNAME=my-username \
+  --build-arg JENKINS_API_TOKEN=my_api_token \
+  .
+```
+
+Against a Jenkins automatically spun up in a container using `docker`:
+
+```sh
+bin/test
+```
+
+Against a Jenkins automatically spun up in a container using `docker compose` or `docker-compose`:
+
+```sh
+docker compose up --build ## docker-compose up --build
+```
+
+### Contributing
+
+Please make all pull requests to the `main` branch and ensure tests pass locally.

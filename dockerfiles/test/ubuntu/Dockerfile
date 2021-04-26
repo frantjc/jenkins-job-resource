@@ -1,4 +1,4 @@
-ARG base_image=alpine:edge
+ARG base_image=ubuntu:bionic
 ARG build_image=golang
 
 FROM ${base_image} as base
@@ -22,22 +22,29 @@ RUN set -e; for pkg in $(go list ./...); do \
 	done
 
 FROM base AS resource
-RUN apk update && \
-	apk add --no-cache ca-certificates
+ENV DEBAIN_FRONTEND=noninteractive
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /assets/ /opt/resource/
 RUN chmod +x /opt/resource/*
 
-FROM resource AS tests
+FROM resource AS test
 COPY --from=builder /tests/ /tests/
 COPY testdata/ testdata/
+COPY bin/wait_for_jenkins /usr/bin/
+COPY bin/test_entrypoint /usr/bin/entrypoint
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    curl \
+  && rm -rf /var/lib/apt/lists/*
 
-ARG SKIP_TESTS
-ARG JENKINS_URL
-ARG JENKINS_JOB
-ARG JENKINS_JOB_TOKEN
-ARG JENKINS_USERNAME
-ARG JENKINS_API_TOKEN
+ENV SKIP_TESTS        ""
+ENV JENKINS_URL       ""
+ENV JENKINS_JOB       ""
+ENV JENKINS_JOB_TOKEN ""
+ENV JENKINS_USERNAME  ""
+ENV JENKINS_API_TOKEN ""
 
-RUN set -e; for test in /tests/*.test; do \
-		$test -ginkgo.v; \
-	done
+CMD ["entrypoint"]
