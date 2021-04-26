@@ -40,7 +40,6 @@ RUN apt-get update \
     curl \
   && rm -rf /var/lib/apt/lists/*
 
-ENV SKIP_TESTS        ""
 ENV JENKINS_URL       ""
 ENV JENKINS_JOB       ""
 ENV JENKINS_JOB_TOKEN ""

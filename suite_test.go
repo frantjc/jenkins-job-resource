@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"strings"
 	"testing"
 
 	resource "github.com/logsquaredn/jenkins-job-resource"
@@ -22,7 +21,6 @@ var bins struct {
 }
 
 var (
-	skipTests = os.Getenv("SKIP_TESTS")
     jenkinsUrl = os.Getenv("JENKINS_URL")
     jenkinsJob = os.Getenv("JENKINS_JOB")
     authenticationToken = os.Getenv("JENKINS_JOB_TOKEN")
@@ -38,9 +36,7 @@ var (
 )
 
 func checkEnvConfigured() {
-	if strings.EqualFold(skipTests, "true") || strings.EqualFold(skipTests, "1") {
-		Skip("skipping: $SKIP_TESTS is true")
-	} else if jenkinsUrl == "" || jenkinsJob == "" || authenticationToken == "" || jenkinsUsername == "" || apiToken == "" {
+	if jenkinsUrl == "" || jenkinsJob == "" || authenticationToken == "" || jenkinsUsername == "" || apiToken == "" {
 		Skip("must specify $JENKINS_URL, $JENKINS_JOB, $JENKINS_JOB_TOKEN, $JENKINS_USERNAME and $JENKINS_API_TOKEN")
 	}
 }
@@ -77,31 +73,33 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	err := json.Unmarshal(bp, &bins)
 	Expect(err).ToNot(HaveOccurred())
 
-	// make sure the job has at least 1 build
-	var (
-		req resource.OutRequest
-		resp resource.OutResponse
-	)
+	if !(jenkinsUrl == "" || jenkinsJob == "" || authenticationToken == "" || jenkinsUsername == "" || apiToken == "") {
+		// make sure the job has at least 1 build
+		var (
+			req resource.OutRequest
+			resp resource.OutResponse
+		)
 
-	req.Source = source
+		req.Source = source
 
-	cmd := exec.Command(bins.Out)
+		cmd := exec.Command(bins.Out)
 
-	payload, err := json.Marshal(req)
-	Expect(err).ToNot(HaveOccurred())
+		payload, err := json.Marshal(req)
+		Expect(err).ToNot(HaveOccurred())
 
-	outBuf := new(bytes.Buffer)
-	errBuf := new(bytes.Buffer)
+		outBuf := new(bytes.Buffer)
+		errBuf := new(bytes.Buffer)
 
-	cmd.Stdin = bytes.NewBuffer(payload)
-	cmd.Stdout = outBuf
-	cmd.Stderr = io.MultiWriter(GinkgoWriter, errBuf)
+		cmd.Stdin = bytes.NewBuffer(payload)
+		cmd.Stdout = outBuf
+		cmd.Stderr = io.MultiWriter(GinkgoWriter, errBuf)
 
-	err = cmd.Run()
-	Expect(err).ToNot(HaveOccurred())
+		err = cmd.Run()
+		Expect(err).ToNot(HaveOccurred())
 
-	err = json.Unmarshal(outBuf.Bytes(), &resp)
-	Expect(err).ToNot(HaveOccurred())
+		err = json.Unmarshal(outBuf.Bytes(), &resp)
+		Expect(err).ToNot(HaveOccurred())
+	}
 })
 
 var _ = SynchronizedAfterSuite(func() {}, func() {

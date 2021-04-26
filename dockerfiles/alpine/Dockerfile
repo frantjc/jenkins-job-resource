@@ -31,7 +31,6 @@ FROM resource AS tests
 COPY --from=builder /tests/ /tests/
 COPY testdata/ testdata/
 
-ARG SKIP_TESTS
 ARG JENKINS_URL
 ARG JENKINS_JOB
 ARG JENKINS_JOB_TOKEN

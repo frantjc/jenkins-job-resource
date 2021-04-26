@@ -35,7 +35,6 @@ COPY bin/test_entrypoint /usr/bin/entrypoint
 RUN apk update && \
 	apk add --no-cache curl
 
-ENV SKIP_TESTS        ""
 ENV JENKINS_URL       ""
 ENV JENKINS_JOB       ""
 ENV JENKINS_JOB_TOKEN ""
