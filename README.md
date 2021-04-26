@@ -133,7 +133,7 @@ bin/test
 * Against a Jenkins automatically spun up in a container using `docker compose` or `docker-compose`:
 
 ```sh
-docker compose up --build ## docker-compose up --build
+docker compose up --build ## or docker-compose up --build
 ```
 
 ### Contributing
