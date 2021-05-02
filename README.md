@@ -89,8 +89,8 @@ Triggers a new build of the target job and gets the result
 ### Prerequisites
 
 * golang is *required* - version 1.11.x or above is required for go mod to work
-* docker is *required* - version 20.10.x is tested; earlier versions may also work.
-* go mod is used for dependency management of the golang packages.
+* docker is *required* - version 20.10.x is tested; earlier versions may also work
+* go mod is used for dependency management of the golang packages
 
 ### Tests
 
@@ -143,4 +143,4 @@ bin/test
 
 ### Contributing
 
-Please make all pull requests to the `main` branch and ensure tests pass locally.
+Please make all pull requests to the `main` branch and ensure tests pass locally
