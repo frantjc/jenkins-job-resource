@@ -12,16 +12,15 @@ import (
 	resource "github.com/logsquaredn/jenkins-job-resource"
 )
 
-var _ = Describe("Check", func () {
+var _ = Describe("Check", func() {
 	var (
-		req             resource.CheckRequest
-		resp		    resource.CheckResponse
-		cmdErr			error
+		req    resource.CheckRequest
+		resp   resource.CheckResponse
+		cmdErr error
 	)
 
-
 	BeforeEach(func() {
-		checkEnvConfigured()
+		checkJenkinsConfigured()
 
 		req.Source = resource.Source{}
 		req.Version = nil
@@ -44,10 +43,8 @@ var _ = Describe("Check", func () {
 
 		cmdErr = cmd.Run()
 
-		if cmdErr == nil {
-			err = json.Unmarshal(outBuf.Bytes(), &resp)
-			Expect(err).ToNot(HaveOccurred())
-		}
+		err = json.Unmarshal(outBuf.Bytes(), &resp)
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	Context("when called with no version", func() {
@@ -72,13 +69,9 @@ var _ = Describe("Check", func () {
 		})
 
 		It("returns all builds since the given version", func() {
-			if cmdErr == nil {
-				Expect(len(resp)).To(BeNumerically(">", 0))
-				for _, version := range resp {
-					Expect(version.Build).To(BeNumerically(">=", req.Version.Build))
-				}
-			} else {
-				Skip("the specified $JENKINS_JOB must use a jenkinsfile like jenkins-job-resource/cicd/pipelines/jenkinsfile")
+			Expect(len(resp)).To(BeNumerically(">", 0))
+			for _, version := range resp {
+				Expect(version.Build).To(BeNumerically(">=", req.Version.Build))
 			}
 		})
 	})

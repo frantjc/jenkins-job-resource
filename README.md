@@ -59,7 +59,7 @@ Produces new versions for all builds (after the last version) ordered by the bui
 
 | Parameter        | Required | Example              | Description                                                                                                               |
 | ---------------- | -------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `accept_results` | no       | `["SUCCESS"]`        | array of acceptable results of the build. The step will fail if none match. Empty arrays are ignored                      |
+| `accept_results` | no       | `[SUCCESS]`          | array of acceptable results of the build. The step will fail if none match. Empty arrays are ignored                      |
 | `regexp`         | no       | `[path/to/output.*]` | limits downloaded artifacts to only those that match one of the given patterns. Hidden files (ex: `.git`) will be ignored |
 | `skip_download`  | no       |                      | whether or not to download any of the artifacts at all. Overrides `regexp`. Default `false`                               |
 
@@ -98,20 +98,16 @@ The tests have been embedded with the `Dockerfile`; ensuring that the testing en
 
 The tests can be ran for both the `ubuntu` and `alpine` images a number of ways:
 
+
+* Against a Jenkins automatically spun up in a container using `docker compose` or `docker-compose`:
+
+```sh
+docker compose up --build # or docker-compose up --build
+```
+
 * Against your own Jenkins job in some Jenkins deployment:
 
 ```sh
-docker build \
-  -t jenkins-job-resource \
-  --target tests \
-  -f dockerfiles/alpine/Dockerfile \
-  --build-arg JENKINS_URL=http://example.jenkins.com \
-  --build-arg JENKINS_JOB=my-jenkins-job \
-  --build-arg JENKINS_JOB_TOKEN=my-jenkins-job-token \
-  --build-arg JENKINS_USERNAME=my-username \
-  --build-arg JENKINS_API_TOKEN=my-api-token \
-  .
-
 docker build \
   -t jenkins-job-resource \
   --target tests \
@@ -121,6 +117,21 @@ docker build \
   --build-arg JENKINS_JOB_TOKEN=my_jenkins_job_token \
   --build-arg JENKINS_USERNAME=my-username \
   --build-arg JENKINS_API_TOKEN=my_api_token \
+  --build-arg JENKINS_JOB_ARTIFACT=my-output.txt \
+  --build-arg JENKINS_JOB_RESULT=SUCCESS \
+  .
+
+docker build \
+  -t jenkins-job-resource \
+  --target tests \
+  -f dockerfiles/alpine/Dockerfile \
+  --build-arg JENKINS_URL=http://example.jenkins.com \
+  --build-arg JENKINS_JOB=my-jenkins-job \
+  --build-arg JENKINS_JOB_TOKEN=my-jenkins-job-token \
+  --build-arg JENKINS_USERNAME=my-username \
+  --build-arg JENKINS_API_TOKEN=my-api-token \
+  --build-arg JENKINS_JOB_ARTIFACT=my-output.txt \
+  --build-arg JENKINS_JOB_RESULT=SUCCESS \
   .
 ```
 
@@ -128,12 +139,6 @@ docker build \
 
 ```sh
 bin/test
-```
-
-* Against a Jenkins automatically spun up in a container using `docker compose` or `docker-compose`:
-
-```sh
-docker compose up --build ## or docker-compose up --build
 ```
 
 ### Contributing

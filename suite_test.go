@@ -21,23 +21,37 @@ var bins struct {
 }
 
 var (
-    jenkinsUrl = os.Getenv("JENKINS_URL")
-    jenkinsJob = os.Getenv("JENKINS_JOB")
-    authenticationToken = os.Getenv("JENKINS_JOB_TOKEN")
-    jenkinsUsername = os.Getenv("JENKINS_USERNAME")
-    apiToken = os.Getenv("JENKINS_API_TOKEN")
-    source = resource.Source{
-    	URL: jenkinsUrl,
-    	Job: jenkinsJob,
-    	Token: authenticationToken,
-    	Username: jenkinsUsername,
-    	Login: apiToken,
-    }
+	jenkinsUrl          = os.Getenv("JENKINS_URL")
+	jenkinsJob          = os.Getenv("JENKINS_JOB")
+	authenticationToken = os.Getenv("JENKINS_JOB_TOKEN")
+	jenkinsUsername     = os.Getenv("JENKINS_USERNAME")
+	apiToken            = os.Getenv("JENKINS_API_TOKEN")
+	jobArtifact         = os.Getenv("JENKINS_JOB_ARTIFACT")
+	jobResult           = os.Getenv("JENKINS_JOB_RESULT")
+	source              = resource.Source{
+		URL:      jenkinsUrl,
+		Job:      jenkinsJob,
+		Token:    authenticationToken,
+		Username: jenkinsUsername,
+		Login:    apiToken,
+	}
 )
 
-func checkEnvConfigured() {
+func checkJenkinsConfigured() {
 	if jenkinsUrl == "" || jenkinsJob == "" || authenticationToken == "" || jenkinsUsername == "" || apiToken == "" {
 		Skip("must specify $JENKINS_URL, $JENKINS_JOB, $JENKINS_JOB_TOKEN, $JENKINS_USERNAME and $JENKINS_API_TOKEN")
+	}
+}
+
+func checkJenkinsArtifactConfigured() {
+	if jobArtifact == "" {
+		Skip("must specify $JENKINS_JOB_ARTIFACT")
+	}
+}
+
+func checkJenkinsResultConfigured() {
+	if jobResult == "" {
+		Skip("must specify $JENKINS_JOB_RESULT")
 	}
 }
 
@@ -76,7 +90,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	if !(jenkinsUrl == "" || jenkinsJob == "" || authenticationToken == "" || jenkinsUsername == "" || apiToken == "") {
 		// make sure the job has at least 1 build
 		var (
-			req resource.OutRequest
+			req  resource.OutRequest
 			resp resource.OutResponse
 		)
 

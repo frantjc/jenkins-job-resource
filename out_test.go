@@ -12,16 +12,15 @@ import (
 	resource "github.com/logsquaredn/jenkins-job-resource"
 )
 
-var _ = Describe("Out", func () {
+var _ = Describe("Out", func() {
 	var (
-		req resource.OutRequest
-		resp resource.OutResponse
+		req    resource.OutRequest
+		resp   resource.OutResponse
 		cmdErr error
 	)
 
-
 	BeforeEach(func() {
-		checkEnvConfigured()
+		checkJenkinsConfigured()
 
 		req.Source = resource.Source{}
 		req.Params = resource.PutParams{}
@@ -57,21 +56,13 @@ var _ = Describe("Out", func () {
 		})
 
 		It("captures metadata", func() {
-			if cmdErr == nil {
-				Expect(cmdErr).NotTo(HaveOccurred())
-				Expect(len(resp.Metadata)).To(BeNumerically(">", 0))
-			} else {
-				Skip("the specified $JENKINS_JOB must use a jenkinsfile like jenkins-job-resource/cicd/pipelines/jenkinsfile")
-			}
+			Expect(cmdErr).NotTo(HaveOccurred())
+			Expect(len(resp.Metadata)).To(BeNumerically(">", 0))
 		})
 
 		It("gets a version", func() {
-			if cmdErr == nil {
-				Expect(cmdErr).NotTo(HaveOccurred())
-				Expect(resp.Version.Build).To(BeNumerically(">", 0))
-			} else {
-				Skip("the specified $JENKINS_JOB must use a jenkinsfile like jenkins-job-resource/cicd/pipelines/jenkinsfile")
-			}
+			Expect(cmdErr).NotTo(HaveOccurred())
+			Expect(resp.Version.Build).To(BeNumerically(">", 0))
 		})
 	})
 })

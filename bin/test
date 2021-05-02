@@ -32,26 +32,30 @@ wait_for_jenkins
 echo "building jenkins-job-resource-ubuntu..."
 docker build \
     --target tests \
+    -f dockerfiles/ubuntu/Dockerfile  \
+    --network host \
     --build-arg JENKINS_URL=$JENKINS_URL \
     --build-arg JENKINS_JOB=jenkins-job-resource-test \
     --build-arg JENKINS_JOB_TOKEN=job_token \
     --build-arg JENKINS_USERNAME=admin \
     --build-arg JENKINS_API_TOKEN=api_token \
-    -f dockerfiles/ubuntu/Dockerfile  \
-    --network host \
+    --build-arg JENKINS_JOB_ARTIFACT=output.txt \
+    --build-arg JENKINS_JOB_RESULT=SUCCESS \
     .
 echo ""
 
 echo "building jenkins-job-resource-alpine..."
 docker build \
     --target tests \
+    -f dockerfiles/alpine/Dockerfile  \
+    --network host \
     --build-arg JENKINS_URL=$JENKINS_URL \
     --build-arg JENKINS_JOB=jenkins-job-resource-test \
     --build-arg JENKINS_JOB_TOKEN=job_token \
     --build-arg JENKINS_USERNAME=admin \
     --build-arg JENKINS_API_TOKEN=api_token \
-    -f dockerfiles/alpine/Dockerfile  \
-    --network host \
+    --build-arg JENKINS_JOB_ARTIFACT=output.txt \
+    --build-arg JENKINS_JOB_RESULT=SUCCESS \
     .
 echo ""
 

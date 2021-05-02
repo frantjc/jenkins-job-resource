@@ -35,10 +35,12 @@ COPY bin/test_entrypoint /usr/bin/entrypoint
 RUN apk update && \
 	apk add --no-cache curl
 
-ENV JENKINS_URL       ""
-ENV JENKINS_JOB       ""
-ENV JENKINS_JOB_TOKEN ""
-ENV JENKINS_USERNAME  ""
-ENV JENKINS_API_TOKEN ""
+ENV JENKINS_URL          ""
+ENV JENKINS_JOB          ""
+ENV JENKINS_JOB_TOKEN    ""
+ENV JENKINS_USERNAME     ""
+ENV JENKINS_API_TOKEN    ""
+ENV JENKINS_JOB_ARTIFACT ""
+ENV JENKINS_JOB_RESULT   ""
 
-CMD ["entrypoint"]
+ENTRYPOINT ["entrypoint"]

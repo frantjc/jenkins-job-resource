@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("Version", func () {
-	It("Should marshal number string into int", func() {
+	It("Should marshal build string into int", func() {
 		var version resource.Version
 		raw := []byte(`{ "build": "11" }`)
 
@@ -19,7 +19,7 @@ var _ = Describe("Version", func () {
 		Expect(version.Build).To(Equal(11))
 	})
 
-	It("Should unmarshal number int into string", func() {
+	It("Should unmarshal build int into string", func() {
 		version := resource.Version{Build: 11}
 
 		json, err := json.Marshal(version)

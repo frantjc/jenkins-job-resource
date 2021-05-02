@@ -22,6 +22,8 @@ services:
       JENKINS_JOB_TOKEN: job_token
       JENKINS_USERNAME: admin
       JENKINS_API_TOKEN: api_token
+      JENKINS_JOB_ARTIFACT: output.txt
+      JENKINS_JOB_RESULT: SUCCESS
     networks:
     - jenkins
     depends_on:
@@ -36,6 +38,8 @@ services:
       JENKINS_JOB_TOKEN: job_token
       JENKINS_USERNAME: admin
       JENKINS_API_TOKEN: api_token
+      JENKINS_JOB_ARTIFACT: output.txt
+      JENKINS_JOB_RESULT: SUCCESS
     networks:
     - jenkins
     depends_on:
