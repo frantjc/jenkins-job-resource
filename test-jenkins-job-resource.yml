@@ -6,11 +6,11 @@ image_resource:
       repository: docker/compose
 inputs:
 - name: jenkins-job-resource
+params:
+  distro: ((distro))
 run:
   path: /usr/local/bin/docker-compose
   args:
-  - up
-  - --build
-  - --exit-code-from
-  - jenkins-job-resource-ubuntu
+  - run
+  - jenkins-job-resource-$distro
   dir: jenkins-job-resource
