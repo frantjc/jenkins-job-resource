@@ -13,14 +13,13 @@ if [ -z "${JENKINS_URL}" ] && [ $# -lt 1 ]; then
   exit 2
 fi
 
-JENKINS_URL=${JENKINS_URL:-$1}
+JENKINS_URL=${1:-$JENKINS_URL}
 
 echo "waiting for jenkins to come up..."
 until curl -s "$JENKINS_URL" -o /dev/null; do
     echo "..."
-    sleep 10
+    sleep 15
 done
-sleep 10
 
 echo "jenkins up"
 exit 0
