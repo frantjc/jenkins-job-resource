@@ -6,12 +6,10 @@ image_resource:
       repository: docker/compose
 inputs:
 - name: jenkins-job-resource
-params:
-  distro: ((distro))
 run:
   path: entrypoint.sh
   args:
   - /usr/bin/docker-compose
   - run
-  - jenkins-job-resource-$distro
+  - jenkins-job-resource-((distro))
   dir: jenkins-job-resource
