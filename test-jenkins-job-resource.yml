@@ -9,7 +9,7 @@ inputs:
 params:
   distro: ((distro))
 run:
-  path: /usr/local/bin/docker-compose
+  path: /usr/bin/docker-compose
   args:
   - run
   - jenkins-job-resource-$distro
