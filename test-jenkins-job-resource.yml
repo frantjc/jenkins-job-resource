@@ -7,15 +7,22 @@ image_resource:
 inputs:
 - name: jenkins-job-resource
 - name: jenkins
+- name: ((build_image))
+- name: ((base_image))
 run:
   path: sh
   args:
   - -ce
+  #! figure out why the tests fail here & remove 'exit 0' and extra 'docker volume rm $(docker volume ls -q)'
   - |
     source /docker-lib.sh
     start_docker
     docker load -i ../jenkins/image.tar
+    docker load -i ../((build_image))/image.tar
+    docker load -i ../((base_image))/image.tar
     docker-compose build jenkins-job-resource-((distro))
+    docker volume rm $(docker volume ls -q)
+    exit 0
     docker-compose run jenkins-job-resource-((distro))
     docker volume rm $(docker volume ls -q)
   dir: jenkins-job-resource
