@@ -20,6 +20,7 @@ until curl -s "$JENKINS_URL" -o /dev/null; do
     echo "..."
     sleep 10
 done
+sleep 10
 
 echo "jenkins up"
 exit 0
