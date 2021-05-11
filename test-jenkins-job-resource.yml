@@ -8,7 +8,7 @@ inputs:
 - name: jenkins-job-resource
 - name: jenkins
 run:
-  path: bash
+  path: sh
   args:
   - -ce
   - |
