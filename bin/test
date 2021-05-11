@@ -9,7 +9,6 @@ if [ $? -ne 0 ]; then
     echo "one of dependencies not found: $DEPENDENCIES"
     exit 1;
 fi
-echo ""
 
 export JENKINS_URL=http://localhost:8080
 JENKINS_HOME=/var/jenkins_home
@@ -25,7 +24,6 @@ docker run -d --rm \
     -e JENKINS_HOME=$JENKINS_HOME \
     --name $TEST_CONTAINER \
     jenkins/jenkins
-echo ""
 
 wait_for_jenkins
 
@@ -42,7 +40,6 @@ docker build \
     --build-arg JENKINS_JOB_ARTIFACT=output.txt \
     --build-arg JENKINS_JOB_RESULT=SUCCESS \
     .
-echo ""
 
 echo "building jenkins-job-resource-alpine..."
 docker build \
@@ -57,10 +54,8 @@ docker build \
     --build-arg JENKINS_JOB_ARTIFACT=output.txt \
     --build-arg JENKINS_JOB_RESULT=SUCCESS \
     .
-echo ""
 
 echo "stopping jenkins/jenkins..."
 docker stop $TEST_CONTAINER
-echo ""
 
 exit 0

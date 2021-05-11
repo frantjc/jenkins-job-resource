@@ -12,7 +12,6 @@ if [ -z "${JENKINS_URL}" ] && [ $# -lt 1 ]; then
   echo "incorrect args: expected \$JENKINS_URL environment variable or wait_for_jenkins \$JENKINS_URL"
   exit 2
 fi
-echo ""
 
 JENKINS_URL=${JENKINS_URL:-$1}
 
@@ -21,8 +20,6 @@ until curl -s "$JENKINS_URL" -o /dev/null; do
     echo "..."
     sleep 10
 done
-echo ""
 
 echo "jenkins up"
-echo ""
 exit 0

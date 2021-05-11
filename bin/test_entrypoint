@@ -7,7 +7,6 @@ if [ $? -ne 0 ]; then
     echo "one of dependencies not found: $DEPENDENCIES"
     exit 1
 fi
-echo ""
 
 wait_for_jenkins $JENKINS_URL/jobs/$JENKINS_JOB
 
