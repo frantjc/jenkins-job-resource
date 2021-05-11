@@ -13,7 +13,7 @@ run:
   path: bash
   args:
   - -ce
-  #! figure out why the tests fail here & remove 'exit 0' and extra 'docker volume rm $(docker volume ls -q)'
+  #! figure out why the tests fail here & remove 'exit 0'
   - |
     source /docker-lib.sh
     start_docker
@@ -21,8 +21,6 @@ run:
     docker load -i ../((build_image))/image.tar
     docker load -i ../((base_image))/image.tar
     docker-compose build jenkins-job-resource-((distro))
-    docker volume rm $(docker volume ls -q)
     exit 0
     docker-compose run jenkins-job-resource-((distro))
-    docker volume rm $(docker volume ls -q)
   dir: jenkins-job-resource
