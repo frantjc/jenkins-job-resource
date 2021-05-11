@@ -10,7 +10,7 @@ inputs:
 - name: ((build_image))
 - name: ((base_image))
 run:
-  path: sh
+  path: bash
   args:
   - -ce
   #! figure out why the tests fail here & remove 'exit 0' and extra 'docker volume rm $(docker volume ls -q)'
