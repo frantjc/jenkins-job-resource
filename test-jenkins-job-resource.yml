@@ -1,0 +1,16 @@
+---
+platform: linux
+image_resource:
+    type: registry-image
+    source:
+      repository: docker/compose
+inputs:
+- name: jenkins-job-resource
+run:
+  path: /usr/local/bin/docker-compose
+  args:
+  - up
+  - --build
+  - --exit-code-from
+  - jenkins-job-resource-ubuntu
+  dir: jenkins-job-resource
