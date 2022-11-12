@@ -1,15 +1,15 @@
-package commands
+package command
 
 import (
 	"fmt"
 	"time"
 
+	resource "github.com/frantjc/jenkins-job-resource"
 	goqs "github.com/google/go-querystring/query"
-	resource "github.com/logsquaredn/jenkins-job-resource"
 )
 
 // Out runs the in script which checks stdin for a JSON object of the form of an OutRequest
-// triggers a new build and then fetches and writes it as well as Metadata about it to stdout
+// triggers a new build and then fetches and writes it as well as Metadata about it to stdout.
 func (r *JenkinsJobResource) Out() error {
 	var (
 		req  resource.OutRequest
@@ -45,22 +45,20 @@ func (r *JenkinsJobResource) Out() error {
 		return fmt.Errorf("no token supplied to source")
 	}
 
-	err = jenkins.Build(job, params)
-	if err != nil {
+	if err = jenkins.Build(job, params); err != nil {
 		return fmt.Errorf("unable to trigger build payload: %s", err)
 	}
 
 	for {
 		if build, err := jenkins.GetBuild(job, job.LastCompletedBuild.Number+1); err == nil {
-			// TODO: do I care if there is an error here?
+			// TODO: do we care if there is an error here?
 			description, _ := r.getDescription(&req.Params)
-			jenkins.SetBuildDescription(build, description)
+			_ = jenkins.SetBuildDescription(build, description)
 
-			resp.Version = r.getVersion(&build)
+			resp.Version = r.getVersion(build)
 			resp.Metadata = r.getMetadata(&build)
 
-			err = r.acceptResult(&build, req.Params.AcceptResults)
-			if err != nil {
+			if err = r.acceptResult(&build, req.Params.AcceptResults); err != nil {
 				return fmt.Errorf("unaccepted result: %s", err)
 			}
 
@@ -70,10 +68,5 @@ func (r *JenkinsJobResource) Out() error {
 		}
 	}
 
-	r.writeOutput(resp)
-	if err != nil {
-		return fmt.Errorf("could not marshal JSON: %s", err)
-	}
-
-	return nil
+	return r.writeOutput(resp)
 }

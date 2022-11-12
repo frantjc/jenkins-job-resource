@@ -9,7 +9,7 @@ resource_types:
 - name: jenkins-job-resource
   type: registry-image
   source:
-    repository: logsquaredn/jenkins-job-resource
+    repository: ghcr.io/frantjc/jenkins-job-resource
     tag: latest
 
 resources:
@@ -96,22 +96,14 @@ Triggers a new build of the target job and gets the result
 
 The tests have been embedded with the `Dockerfile`; ensuring that the testing environment is consistent across any `docker` enabled platform. When the docker image builds, the test are run inside the docker container, on failure they will stop the build.
 
-The tests can be ran for both the `ubuntu` and `alpine` images a number of ways:
-
-
-* Against a Jenkins automatically spun up in a container using `docker compose` or `docker-compose`:
-
-```sh
-docker compose up --build # or docker-compose up --build
-```
+The tests can be ran in a number of ways:
 
 * Against your own Jenkins job in some Jenkins deployment:
 
 ```sh
 docker build \
   -t jenkins-job-resource \
-  --target tests \
-  -f dockerfiles/ubuntu/Dockerfile \
+  --target test \
   --build-arg JENKINS_URL=http://example.jenkins.com \
   --build-arg JENKINS_JOB=my-jenkins-job \
   --build-arg JENKINS_JOB_TOKEN=my_jenkins_job_token \
@@ -120,25 +112,12 @@ docker build \
   --build-arg JENKINS_JOB_ARTIFACT=my-output.txt \
   --build-arg JENKINS_JOB_RESULT=SUCCESS \
   .
-
-docker build \
-  -t jenkins-job-resource \
-  --target tests \
-  -f dockerfiles/alpine/Dockerfile \
-  --build-arg JENKINS_URL=http://example.jenkins.com \
-  --build-arg JENKINS_JOB=my-jenkins-job \
-  --build-arg JENKINS_JOB_TOKEN=my-jenkins-job-token \
-  --build-arg JENKINS_USERNAME=my-username \
-  --build-arg JENKINS_API_TOKEN=my-api-token \
-  --build-arg JENKINS_JOB_ARTIFACT=my-output.txt \
-  --build-arg JENKINS_JOB_RESULT=SUCCESS \
-  .
 ```
 
 * Against a Jenkins automatically spun up in a container using `docker`:
 
 ```sh
-bin/test
+make test
 ```
 
 ### Contributing

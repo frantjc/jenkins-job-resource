@@ -1,4 +1,5 @@
 #!/bin/sh
+
 JENKINS_JOB_RESOURCE=$(cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && cd .. && pwd)
 PATH=$PATH:$JENKINS_JOB_RESOURCE/bin
 DEPENDENCIES="docker wait_for_jenkins uuidgen"
@@ -10,11 +11,8 @@ if [ $? -ne 0 ]; then
     exit 1;
 fi
 
-export JENKINS_URL=http://localhost:8080
 JENKINS_HOME=/var/jenkins_home
 TEST_CONTAINER=$(uuidgen | tr A-Z a-z)
-
-set -e
 
 echo "running jenkins/jenkins..."
 docker run -d --rm \
@@ -24,13 +22,16 @@ docker run -d --rm \
     -e JENKINS_HOME=$JENKINS_HOME \
     --name $TEST_CONTAINER \
     jenkins/jenkins
+if [ $? -ne 0 ]; then
+    exit $?;
+fi
 
+export JENKINS_URL=http://localhost:8080
 wait_for_jenkins
 
-echo "building jenkins-job-resource-ubuntu..."
+echo "building jenkins-job-resource..."
 docker build \
-    --target tests \
-    -f dockerfiles/ubuntu/Dockerfile  \
+    --target test \
     --network host \
     --build-arg JENKINS_URL=$JENKINS_URL \
     --build-arg JENKINS_JOB=jenkins-job-resource-test \
@@ -40,22 +41,13 @@ docker build \
     --build-arg JENKINS_JOB_ARTIFACT=output.txt \
     --build-arg JENKINS_JOB_RESULT=SUCCESS \
     .
-
-echo "building jenkins-job-resource-alpine..."
-docker build \
-    --target tests \
-    -f dockerfiles/alpine/Dockerfile  \
-    --network host \
-    --build-arg JENKINS_URL=$JENKINS_URL \
-    --build-arg JENKINS_JOB=jenkins-job-resource-test \
-    --build-arg JENKINS_JOB_TOKEN=job_token \
-    --build-arg JENKINS_USERNAME=admin \
-    --build-arg JENKINS_API_TOKEN=api_token \
-    --build-arg JENKINS_JOB_ARTIFACT=output.txt \
-    --build-arg JENKINS_JOB_RESULT=SUCCESS \
-    .
+if [ $? -ne 0 ]; then
+    echo "stopping jenkins/jenkins..."
+    docker stop $TEST_CONTAINER
+    exit $?;
+fi
 
 echo "stopping jenkins/jenkins..."
 docker stop $TEST_CONTAINER
 
-exit 0
+exit $?

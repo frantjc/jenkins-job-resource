@@ -4,3 +4,6 @@
 # jenkins
 testdata/jobs/*/*
 !testdata/jobs/*/config.xml
+
+# goreleaser
+dist/

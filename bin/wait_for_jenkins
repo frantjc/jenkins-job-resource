@@ -1,4 +1,5 @@
 #!/bin/sh
+
 DEPENDENCIES="curl"
 
 echo "checking for dependencies..."

@@ -3,7 +3,6 @@ package resource_test
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,7 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	resource "github.com/logsquaredn/jenkins-job-resource"
+	resource "github.com/frantjc/jenkins-job-resource"
 )
 
 var _ = Describe("In", func() {
@@ -25,9 +24,7 @@ var _ = Describe("In", func() {
 	BeforeEach(func() {
 		checkJenkinsConfigured()
 
-		var err error
-		src, err = ioutil.TempDir("", "in-jenkins-job-resource")
-		Expect(err).ToNot(HaveOccurred())
+		src = filepath.Join(os.TempDir(), "in-jenkins-job-resource")
 
 		req.Source = resource.Source{}
 		req.Params = resource.GetParams{}
@@ -38,7 +35,7 @@ var _ = Describe("In", func() {
 	})
 
 	JustBeforeEach(func() {
-		cmd := exec.Command(bins.In, src)
+		cmd := exec.Command(bins.In, src) //nolint:gosec
 
 		payload, err := json.Marshal(req)
 		Expect(err).ToNot(HaveOccurred())
@@ -109,7 +106,7 @@ var _ = Describe("In", func() {
 			AfterEach(func() {
 				req.Params.SkipDownload = false
 			})
-	
+
 			It("doesn't get the version's artifacts", func() {
 				checkJenkinsArtifactConfigured()
 				Expect(cmdErr).NotTo(HaveOccurred())
@@ -126,7 +123,7 @@ var _ = Describe("In", func() {
 			AfterEach(func() {
 				req.Params.Regexp = nil
 			})
-	
+
 			It("gets the version's artifacts", func() {
 				checkJenkinsArtifactConfigured()
 				Expect(cmdErr).NotTo(HaveOccurred())
@@ -143,7 +140,7 @@ var _ = Describe("In", func() {
 			AfterEach(func() {
 				req.Params.Regexp = nil
 			})
-	
+
 			It("doesn't get the version's artifacts", func() {
 				checkJenkinsArtifactConfigured()
 				Expect(cmdErr).NotTo(HaveOccurred())
@@ -160,7 +157,7 @@ var _ = Describe("In", func() {
 			AfterEach(func() {
 				req.Params.AcceptResults = nil
 			})
-	
+
 			It("errors", func() {
 				checkJenkinsArtifactConfigured()
 				Expect(cmdErr).To(HaveOccurred())
@@ -175,7 +172,7 @@ var _ = Describe("In", func() {
 			AfterEach(func() {
 				req.Params.AcceptResults = nil
 			})
-	
+
 			It("doesn't error", func() {
 				checkJenkinsArtifactConfigured()
 				Expect(cmdErr).NotTo(HaveOccurred())

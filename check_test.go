@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	resource "github.com/logsquaredn/jenkins-job-resource"
+	resource "github.com/frantjc/jenkins-job-resource"
 )
 
 var _ = Describe("Check", func() {
@@ -29,7 +29,7 @@ var _ = Describe("Check", func() {
 	})
 
 	JustBeforeEach(func() {
-		cmd := exec.Command(bins.Check)
+		cmd := exec.Command(bins.Check) //nolint:gosec
 
 		payload, err := json.Marshal(req)
 		Expect(err).ToNot(HaveOccurred())

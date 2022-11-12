@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"testing"
 
-	resource "github.com/logsquaredn/jenkins-job-resource"
+	resource "github.com/frantjc/jenkins-job-resource"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
@@ -21,7 +21,7 @@ var bins struct {
 }
 
 var (
-	jenkinsUrl          = os.Getenv("JENKINS_URL")
+	jenkinsURL          = os.Getenv("JENKINS_URL")
 	jenkinsJob          = os.Getenv("JENKINS_JOB")
 	authenticationToken = os.Getenv("JENKINS_JOB_TOKEN")
 	jenkinsUsername     = os.Getenv("JENKINS_USERNAME")
@@ -29,7 +29,7 @@ var (
 	jobArtifact         = os.Getenv("JENKINS_JOB_ARTIFACT")
 	jobResult           = os.Getenv("JENKINS_JOB_RESULT")
 	source              = resource.Source{
-		URL:      jenkinsUrl,
+		URL:      jenkinsURL,
 		Job:      jenkinsJob,
 		Token:    authenticationToken,
 		Username: jenkinsUsername,
@@ -38,7 +38,7 @@ var (
 )
 
 func checkJenkinsConfigured() {
-	if jenkinsUrl == "" || jenkinsJob == "" || authenticationToken == "" || jenkinsUsername == "" || apiToken == "" {
+	if jenkinsURL == "" || jenkinsJob == "" || authenticationToken == "" || jenkinsUsername == "" || apiToken == "" {
 		Skip("must specify $JENKINS_URL, $JENKINS_JOB, $JENKINS_JOB_TOKEN, $JENKINS_USERNAME and $JENKINS_API_TOKEN")
 	}
 }
@@ -49,33 +49,27 @@ func checkJenkinsArtifactConfigured() {
 	}
 }
 
-func checkJenkinsResultConfigured() {
-	if jobResult == "" {
-		Skip("must specify $JENKINS_JOB_RESULT")
-	}
-}
-
 var _ = SynchronizedBeforeSuite(func() []byte {
 	b := bins
 
 	if _, err := os.Stat("/opt/resource/in"); err == nil {
 		b.In = "/opt/resource/in"
 	} else {
-		b.In, err = gexec.Build("github.com/logsquaredn/jenkins-job-resource/cmd/in")
+		b.In, err = gexec.Build("github.com/frantjc/jenkins-job-resource/cmd/in")
 		Expect(err).ToNot(HaveOccurred())
 	}
 
 	if _, err := os.Stat("/opt/resource/out"); err == nil {
 		b.Out = "/opt/resource/out"
 	} else {
-		b.Out, err = gexec.Build("github.com/logsquaredn/jenkins-job-resource/cmd/out")
+		b.Out, err = gexec.Build("github.com/frantjc/jenkins-job-resource/cmd/out")
 		Expect(err).ToNot(HaveOccurred())
 	}
 
 	if _, err := os.Stat("/opt/resource/check"); err == nil {
 		b.Check = "/opt/resource/check"
 	} else {
-		b.Check, err = gexec.Build("github.com/logsquaredn/jenkins-job-resource/cmd/check")
+		b.Check, err = gexec.Build("github.com/frantjc/jenkins-job-resource/cmd/check")
 		Expect(err).ToNot(HaveOccurred())
 	}
 
@@ -87,7 +81,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	err := json.Unmarshal(bp, &bins)
 	Expect(err).ToNot(HaveOccurred())
 
-	if !(jenkinsUrl == "" || jenkinsJob == "" || authenticationToken == "" || jenkinsUsername == "" || apiToken == "") {
+	if !(jenkinsURL == "" || jenkinsJob == "" || authenticationToken == "" || jenkinsUsername == "" || apiToken == "") {
 		// make sure the job has at least 1 build
 		var (
 			req  resource.OutRequest
@@ -96,7 +90,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 		req.Source = source
 
-		cmd := exec.Command(bins.Out)
+		cmd := exec.Command(bins.Out) //nolint:gosec
 
 		payload, err := json.Marshal(req)
 		Expect(err).ToNot(HaveOccurred())

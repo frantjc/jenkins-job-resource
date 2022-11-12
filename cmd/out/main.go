@@ -4,19 +4,16 @@ import (
 	"log"
 	"os"
 
-	"github.com/logsquaredn/jenkins-job-resource/commands"
+	"github.com/frantjc/jenkins-job-resource/pkg/command"
 )
 
 func main() {
-	command := commands.NewJenkinsJobResource(
+	if err := command.NewJenkinsJobResource(
 		os.Stdin,
 		os.Stderr,
 		os.Stdout,
 		os.Args,
-	)
-
-	err := command.Out()
-	if err != nil {
+	).Out(); err != nil {
 		log.Fatal(err)
 	}
 }

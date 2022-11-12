@@ -1,19 +1,18 @@
-package commands
+package command
 
 import (
-	"strings"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
-	resource "github.com/logsquaredn/jenkins-job-resource"
+	resource "github.com/frantjc/jenkins-job-resource"
 )
 
 // In runs the in script which checks stdin for a JSON object of the form of an InRequest
 // fetches and writes the requested Version as well as Metadata about it to stdout and
-// writes each of its output Artifacts to src/Artifact.FileName
+// writes each of its output Artifacts to src/Artifact.FileName.
 func (r *JenkinsJobResource) In() error {
 	var (
 		req  resource.InRequest
@@ -47,7 +46,7 @@ func (r *JenkinsJobResource) In() error {
 		return fmt.Errorf("requested version of resource %d unavailable: %s", req.Version.Build, err)
 	}
 
-	resp.Version = r.getVersion(&build)
+	resp.Version = r.getVersion(build)
 	resp.Metadata = r.getMetadata(&build)
 
 	err = r.acceptResult(&build, req.Params.AcceptResults)
@@ -73,19 +72,18 @@ func (r *JenkinsJobResource) In() error {
 				if match {
 					data, err := jenkins.GetArtifact(build, artifact)
 					if err == nil {
-						ioutil.WriteFile(filepath.Join(src, artifact.FileName), data, 0644)
+						if err = os.WriteFile(filepath.Join(src, artifact.FileName), data, 0600); err != nil {
+							return err
+						}
 					}
 				}
 			}
 		}
 	}
 
-	r.writeMetadata(resp.Metadata)
-
-	r.writeOutput(resp)
-	if err != nil {
-		return fmt.Errorf("could not marshal JSON: %s", err)
+	if err = r.writeMetadata(resp.Metadata); err != nil {
+		return err
 	}
 
-	return nil
+	return r.writeOutput(resp)
 }

@@ -1,0 +1,46 @@
+builds:
+  - main: ./internal/cmd/nop
+    ldflags:
+      - -s -w
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+changelog:
+  use: github
+  filters:
+    exclude:
+      - merge conflict
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+dockers:
+  - image_templates:
+      - ghcr.io/frantjc/jenkins-job-resource
+      - ghcr.io/frantjc/jenkins-job-resource:{{ .Major }}
+      - ghcr.io/frantjc/jenkins-job-resource:{{ .Major }}.{{ .Minor }}
+      - ghcr.io/frantjc/jenkins-job-resource:{{ .Version }}
+    use: buildx
+    build_flag_templates:
+      - --pull
+      - --label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/frantjc/jenkins-job-resource/main/README.md
+      - --label=io.artifacthub.package.license=MIT
+      - --label=org.opencontainers.image.created={{ .Date }}
+      - --label=org.opencontainers.image.name={{ .ProjectName }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.source={{ .GitURL }}
+      - --platform=linux/amd64
+    extra_files:
+      - cmd
+      - pkg
+      - go.mod
+      - go.sum
+      - check_test.go
+      - in_test.go
+      - out_test.go
+      - suite_test.go
+      - types_test.go
+      - types.go

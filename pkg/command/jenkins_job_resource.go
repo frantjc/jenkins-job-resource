@@ -1,21 +1,20 @@
-package commands
+package command
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 
 	gojenkins "github.com/yosida95/golang-jenkins"
 
-	resource "github.com/logsquaredn/jenkins-job-resource"
+	resource "github.com/frantjc/jenkins-job-resource"
 )
 
 // JenkinsJobResource struct which has the Check, In, and Out methods on it which comprise
-// the three scripts needed to implement a Concourse Resource Type
+// the three scripts needed to implement a Concourse Resource Type.
 type JenkinsJobResource struct {
 	stdin  io.Reader
 	stderr io.Writer
@@ -23,7 +22,7 @@ type JenkinsJobResource struct {
 	args   []string
 }
 
-// NewJenkinsJobResource creates a new JenkinsJobResource struct
+// NewJenkinsJobResource creates a new JenkinsJobResource struct.
 func NewJenkinsJobResource(
 	stdin io.Reader,
 	stderr io.Writer,
@@ -74,7 +73,7 @@ func (r *JenkinsJobResource) getMetadata(build *gojenkins.Build) []resource.Meta
 }
 
 func (r *JenkinsJobResource) acceptResult(build *gojenkins.Build, acceptResults []string) error {
-	if acceptResults == nil || len(acceptResults) == 0 {
+	if len(acceptResults) == 0 {
 		return nil
 	}
 
@@ -111,7 +110,7 @@ func (r *JenkinsJobResource) newJenkins(s resource.Source) *gojenkins.Jenkins {
 	)
 }
 
-func (r *JenkinsJobResource) getVersion(b *gojenkins.Build) resource.Version {
+func (r *JenkinsJobResource) getVersion(b gojenkins.Build) resource.Version {
 	return resource.Version{
 		Build: b.Number,
 	}
@@ -129,8 +128,7 @@ func (r *JenkinsJobResource) writeMetadata(mds []resource.Metadata) error {
 	}
 
 	for _, md := range mds {
-		err = ioutil.WriteFile(filepath.Join(src, ".metadata", md.Name), []byte(md.Value), 0644)
-		if err != nil {
+		if err = os.WriteFile(filepath.Join(src, ".metadata", md.Name), []byte(md.Value), 0600); err != nil {
 			return err
 		}
 	}
@@ -145,7 +143,7 @@ func (r *JenkinsJobResource) getCause(p *resource.PutParams) (string, error) {
 			return "", err
 		}
 
-		b, err := ioutil.ReadFile(filepath.Join(src, p.CauseFile))
+		b, err := os.ReadFile(filepath.Join(src, p.CauseFile))
 		if err != nil {
 			return "", err
 		}
@@ -165,7 +163,7 @@ func (r *JenkinsJobResource) getDescription(p *resource.PutParams) (string, erro
 			return "", err
 		}
 
-		b, err := ioutil.ReadFile(filepath.Join(src, p.DescriptionFile))
+		b, err := os.ReadFile(filepath.Join(src, p.DescriptionFile))
 		if err != nil {
 			return "", err
 		}
