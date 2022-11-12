@@ -1,6 +1,6 @@
-# jenkins-job-resource
+# jenkins-job-resource [![CI](https://github.com/frantjc/jenkins-job-resource/actions/workflows/push.yml/badge.svg?branch=main&event=push)](https://github.com/frantjc/jenkins-job-resource/actions)
 
-A Concourse resource for jobs on Jenkins.  Written in Go.
+A Concourse resource for jobs on Jenkins.
 
 ## Example
 
@@ -84,17 +84,13 @@ SUCCESS
 
 Triggers a new build of the target job and gets the result
 
-## Development
+## developing
 
-### Prerequisites
+- `make` is recommended - version 3.81 is tested
+- `golang` is _required_ - version 1.18.x or above is required for [generics](https://go.dev/doc/tutorial/generics)
+- `docker` is _required_ - version 20.10.x is tested
 
-* golang is *required* - version 1.11.x or above is required for go mod to work
-* docker is *required* - version 20.10.x is tested; earlier versions may also work
-* go mod is used for dependency management of the golang packages
-
-### Tests
-
-The tests have been embedded with the `Dockerfile`; ensuring that the testing environment is consistent across any `docker` enabled platform. When the docker image builds, the test are run inside the docker container, on failure they will stop the build.
+Tests have been embedded with the `Dockerfile`; ensuring that the testing environment is consistent across any `docker` enabled platform. When the docker image builds, the test are run inside the docker container, on failure they will stop the build.
 
 The tests can be ran in a number of ways:
 
@@ -119,7 +115,3 @@ docker build \
 ```sh
 make test
 ```
-
-### Contributing
-
-Please make all pull requests to the `main` branch and ensure tests pass locally
