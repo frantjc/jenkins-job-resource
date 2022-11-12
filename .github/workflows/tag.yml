@@ -3,11 +3,9 @@ on:
   push:
     tags:
       - 'v*'
-permissions:
-  contents: read
-  packages: write
+permissions: write-all
 jobs:
-  push:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: setup-buildx
