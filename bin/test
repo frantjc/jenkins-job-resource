@@ -1,8 +1,7 @@
 #!/bin/sh
 
 JENKINS_JOB_RESOURCE=$(cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && cd .. && pwd)
-PATH=$PATH:$JENKINS_JOB_RESOURCE/bin
-DEPENDENCIES="docker wait_for_jenkins uuidgen"
+DEPENDENCIES="curl docker uuidgen"
 
 echo "checking for dependencies..."
 which -a $DEPENDENCIES
@@ -26,8 +25,13 @@ if [ $? -ne 0 ]; then
     exit $?;
 fi
 
-export JENKINS_URL=http://localhost:8080
-wait_for_jenkins
+JENKINS_URL=http://localhost:8080
+
+echo "waiting for jenkins to come up..."
+until curl -s "$JENKINS_URL" -o /dev/null; do
+    echo "..."
+    sleep 15
+done
 
 echo "building jenkins-job-resource..."
 docker build \
@@ -40,7 +44,7 @@ docker build \
     --build-arg JENKINS_API_TOKEN=api_token \
     --build-arg JENKINS_JOB_ARTIFACT=output.txt \
     --build-arg JENKINS_JOB_RESULT=SUCCESS \
-    .
+    $JENKINS_JOB_RESOURCE
 if [ $? -ne 0 ]; then
     echo "stopping jenkins/jenkins..."
     docker stop $TEST_CONTAINER
