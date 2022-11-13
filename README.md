@@ -1,36 +1,31 @@
 # jenkins-job-resource [![CI](https://github.com/frantjc/jenkins-job-resource/actions/workflows/push.yml/badge.svg?branch=main&event=push)](https://github.com/frantjc/jenkins-job-resource/actions)
 
-A Concourse resource for jobs on Jenkins.
+A Concourse resource for Jenkins jobs.
 
 ## Example
 
 ```yaml
 resource_types:
-- name: jenkins-job-resource
-  type: registry-image
-  source:
-    repository: ghcr.io/frantjc/jenkins-job-resource
-    tag: latest
-
+  - name: jenkins-job-resource
+    type: registry-image
+    source:
+      repository: ghcr.io/frantjc/jenkins-job-resource
+      tag: latest
 resources:
-- name: my-jenkins-job
-  type: jenkins-job-resource
-  source:
-    ...
-
+  - name: my-jenkins-job
+    type: jenkins-job-resource
+    source:
 jobs:
-- name: some-job
-  plan:
-  ...
-  - put: my-jenkins-job
-    params:
-      cause: some-job in Concourse caused this build
-      build_params:
-        foo: bar
-
-- name: another-job
-  plan:
-  - get: my-jenkins-job
+  - name: some-job
+    plan:
+      - put: my-jenkins-job
+        params:
+          cause: some-job in Concourse caused this build
+          build_params:
+            foo: bar
+  - name: another-job
+    plan:
+      - get: my-jenkins-job
 ```
 
 ## Source Configuration
@@ -89,29 +84,3 @@ Triggers a new build of the target job and gets the result
 - `make` is recommended - version 3.81 is tested
 - `golang` is _required_ - version 1.18.x or above is required for [generics](https://go.dev/doc/tutorial/generics)
 - `docker` is _required_ - version 20.10.x is tested
-
-Tests have been embedded with the `Dockerfile`; ensuring that the testing environment is consistent across any `docker` enabled platform. When the docker image builds, the test are run inside the docker container, on failure they will stop the build.
-
-The tests can be ran in a number of ways:
-
-* Against your own Jenkins job in some Jenkins deployment:
-
-```sh
-docker build \
-  -t jenkins-job-resource \
-  --target test \
-  --build-arg JENKINS_URL=http://example.jenkins.com \
-  --build-arg JENKINS_JOB=my-jenkins-job \
-  --build-arg JENKINS_JOB_TOKEN=my_jenkins_job_token \
-  --build-arg JENKINS_USERNAME=my-username \
-  --build-arg JENKINS_API_TOKEN=my_api_token \
-  --build-arg JENKINS_JOB_ARTIFACT=my-output.txt \
-  --build-arg JENKINS_JOB_RESULT=SUCCESS \
-  .
-```
-
-* Against a Jenkins automatically spun up in a container using `docker`:
-
-```sh
-make test
-```
