@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/frantjc/jenkins-job-resource/pkg/command"
+	"github.com/frantjc/jenkins-job-resource/command"
 )
 
 func main() {

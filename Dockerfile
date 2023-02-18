@@ -1,5 +1,5 @@
-ARG base_image=alpine:3.15
-ARG build_image=golang:1.19-alpine3.15
+ARG base_image=alpine:3.16
+ARG build_image=golang:1.20-alpine3.16
 
 FROM ${build_image} AS build
 ENV CGO_ENABLED 0
