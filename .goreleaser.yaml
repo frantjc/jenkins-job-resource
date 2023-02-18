@@ -35,7 +35,7 @@ dockers:
       - --platform=linux/amd64
     extra_files:
       - cmd
-      - pkg
+      - command
       - go.mod
       - go.sum
       - check_test.go
