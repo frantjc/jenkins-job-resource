@@ -63,9 +63,9 @@ func (r *JenkinsJobResource) Out() error {
 			}
 
 			break
-		} else {
-			time.Sleep(5 * time.Second)
 		}
+
+		time.Sleep(5 * time.Second)
 	}
 
 	return r.writeOutput(resp)
